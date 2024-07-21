@@ -1,0 +1,68 @@
+.navbar {
+  background: linear-gradient(
+    rgba(20, 24, 29, 0.85),
+    rgba(20, 24, 29, 0.5),
+    transparent
+  );
+  z-index: 50;
+  position: relative;
+  transition: 0.2s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.navbar:hover {
+  background: linear-gradient(rgba(20, 24, 29, 1), transparent);
+}
+
+.navbar-old {
+  background: linear-gradient(
+    #14181c 0%,
+    rgba(20, 24, 29, 0.8) 5%,
+    rgba(20, 24, 29, 0.7) 10%,
+    rgba(20, 24, 29, 0.6) 15%,
+    rgba(20, 24, 29, 0.55) 30%,
+    rgba(20, 24, 29, 0.45) 40%,
+    rgba(20, 24, 29, 0.35) 45%,
+    rgba(20, 24, 29, 0.2) 50%,
+    rgba(20, 24, 29, 0.18) 60%,
+    rgba(20, 24, 29, 0.15) 70%,
+    rgba(20, 24, 29, 0.13) 75%,
+    rgba(20, 24, 29, 0.12) 80%,
+
+    rgba(20, 24, 29, 0.1) 82%,
+    rgba(20, 24, 29, 0.08) 85%,
+    rgba(20, 24, 29, 0.05) 87.22%,
+    rgba(20, 24, 29, 0.03) 90%,
+    rgba(20, 24, 29, 0.0225) 92%,
+    rgba(20, 24, 29, 0.0157) 94%,
+    rgba(20, 24, 29, 0.01) 96%,
+    rgba(20, 24, 29, 0.005) 98%,
+    rgba(20, 24, 29, 1.001) 99%
+  );
+}
+
+.navbar-old:hover {
+  background: linear-gradient(
+    #14181c 0%,
+    rgba(20, 24, 29, 0.7) 5%,
+    rgba(20, 24, 29, 0.5) 10%,
+    rgba(20, 24, 29, 0.4) 15%,
+    rgba(20, 24, 29, 0.35) 30%,
+    rgba(20, 24, 29, 0.25) 40%,
+    rgba(20, 24, 29, 0.15) 45%,
+    rgba(20, 24, 29, 0.1) 50%,
+    transparent
+  );
+}
+
+.header-text {
+  font-size: 0.75rem;
+  font-weight: 650;
+  @apply text-header-light-grey;
+  text-transform: uppercase;
+}
+
+.search-bar {
+  font-size: xx-small;
+  font-weight: 350;
+  transition: 0.2s cubic-bezier(0.76, 0, 0.24, 1);
+}
