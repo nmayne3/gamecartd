@@ -1,22 +1,23 @@
 import Image, { StaticImageData } from "next/image";
 import BGImage from "@/assets/kindsofkindness.jpg";
-import Poster from "@/assets/poster.jpg";
 import BoxArt from "@/components/boxart";
 import "@/app/styles/home.css";
 import { FaEye, FaHeart } from "react-icons/fa6";
-const auth = require("@/igdb/auth");
+import Link from "next/link";
+import { getAccessToken, client_id } from "@/igdb/auth";
 
 const TopFive = async () => {
   var games = Array();
+  const access_token = getAccessToken();
 
   await fetch("https://api.igdb.com/v4/games", {
     method: "POST",
     headers: {
       Accept: "application/json",
-      "Client-ID": auth.client_id,
-      Authorization: "Bearer " + auth.access_token,
+      "Client-ID": client_id,
+      Authorization: "Bearer " + access_token,
     },
-    body: "fields name, first_release_date, aggregated_rating, aggregated_rating_count, cover.*; where first_release_date > 1704096000 & aggregated_rating_count >= 3; sort aggregated_rating desc; limit 5;",
+    body: "fields name, slug, first_release_date, aggregated_rating, aggregated_rating_count, cover.*; where first_release_date > 1704096000 & aggregated_rating_count >= 3; sort aggregated_rating desc; limit 5;",
   })
     .then((response) => {
       console.log("Response Status: ", response.status);
@@ -28,7 +29,6 @@ const TopFive = async () => {
         console.log(typeof game);
       }
       games = data;
-      console.log(data);
     })
     .catch((err) => {
       console.error(err);
@@ -38,9 +38,11 @@ const TopFive = async () => {
     <div className="flex flex-row gap-8 h-fit w-fit">
       {games.map((game) => (
         <div className="object-scale-downs poster w-24 " key={game.id}>
-          <BoxArt game={game}>
-            <StatCard />
-          </BoxArt>
+          <Link href={`/game/${game.slug}`}>
+            <BoxArt game={game}>
+              <StatCard />
+            </BoxArt>
+          </Link>
         </div>
       ))}
     </div>
@@ -51,11 +53,11 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col max-w-screen-2xl items-center gap-8">
       {/** Backdrop Image Container */}
-      <div className="h-fit max-w-[1200px] fade-in bg-cover bg-top bg-no-repeat mask -z-10">
+      <div className="h-fit max-w-[1200px] fade-in bg-cover bg-top bg-no-repeat mask">
         <Image src={BGImage} alt={"Kinds of Kindness"} className="z-0" />
       </div>
       {/** Content */}
-      <div className="flex flex-col w-5/6 gap-6 items-center -mt-72">
+      <div className="flex flex-col w-5/6 gap-6 items-center -mt-72 z-10">
         <div className=" basis-4/5 mb-12 -rotate-90 -mr-4 self-end text-xs z-50 text-discrete-grey brightness-50 font-light">
           {" "}
           Kinds of Kindness (2024){" "}

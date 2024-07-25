@@ -10,7 +10,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nextui-org/system": "^2.2.5",
+    "@nextui-org/tabs": "^2.0.35",
+    "@nextui-org/theme": "^2.2.9",
     "@prisma/client": "^5.17.0",
+    "framer-motion": "^11.3.17",
     "next": "14.2.5",
     "postgres": "^3.4.4",
     "react": "^18",
