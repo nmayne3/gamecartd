@@ -4,68 +4,46 @@ import BoxArt from "@/components/boxart";
 import "@/app/styles/home.css";
 import { FaEye, FaHeart } from "react-icons/fa6";
 import Link from "next/link";
+import RowGames from "@/components/rowgames";
 import { getAccessToken, client_id } from "@/igdb/auth";
+import { Section } from "@/components/section";
+import { ReviewCard } from "@/components/reviewcard";
+import { GetGames } from "@/igdb/api";
+import { GetReleaseYear } from "@/igdb/helpers";
 
-const TopFive = async () => {
-  var games = Array();
-  const access_token = getAccessToken();
-
-  await fetch("https://api.igdb.com/v4/games", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Client-ID": client_id,
-      Authorization: "Bearer " + access_token,
-    },
-    body: "fields name, slug, first_release_date, aggregated_rating, aggregated_rating_count, cover.*; where first_release_date > 1704096000 & aggregated_rating_count >= 3; sort aggregated_rating desc; limit 5;",
-  })
-    .then((response) => {
-      console.log("Response Status: ", response.status);
-      return response.json();
-    })
-    .then((data) => {
-      for (const game of data) {
-        console.log(game.name);
-        console.log(typeof game);
-      }
-      games = data;
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+export default async function Home() {
+  const FeaturedGames = await GetGames({
+    fields:
+      "name, slug, first_release_date, aggregated_rating, aggregated_rating_count, cover.*, artworks.*",
+    filter: "first_release_date > 1704096000 & aggregated_rating_count >= 3",
+    sort: "aggregated_rating desc",
+    limit: 6,
+  });
+  const bgGame = FeaturedGames[0];
+  const bg = bgGame.artworks[0];
 
   return (
-    <div className="flex flex-row gap-8 h-fit w-fit">
-      {games.map((game) => (
-        <div className="object-scale-downs poster w-24 " key={game.id}>
-          <Link href={`/game/${game.slug}`}>
-            <BoxArt game={game}>
-              <StatCard />
-            </BoxArt>
-          </Link>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col max-w-screen-2xl items-center gap-8">
+    <main className="flex min-h-screen flex-col max-w-screen-2xl items-center gap-8 mx-auto">
       {/** Backdrop Image Container */}
-      <div className="h-fit max-w-[1200px] fade-in bg-cover bg-top bg-no-repeat mask">
-        <Image src={BGImage} alt={"Kinds of Kindness"} className="z-0" />
+      <div className="h-fit max-w-[1200px] bg-cover bg-top bg-no-repeat mask">
+        <Image
+          src={`https://images.igdb.com/igdb/image/upload/t_1080p/${bg.image_id}.jpg`}
+          width={bg.width}
+          height={bg.height}
+          alt={bgGame.name}
+          className="z-0 object-cover aspect-video fade-in w-[1200px]"
+        />
       </div>
       {/** Content */}
-      <div className="flex flex-col w-5/6 gap-6 items-center -mt-72 z-10">
-        <div className=" basis-4/5 mb-12 -rotate-90 -mr-4 self-end text-xs z-50 text-discrete-grey brightness-50 font-light">
+      <div className="flex flex-col max-w-screen-lg w-5/6 gap-6 items-center -mt-72 z-10">
+        <div className=" basis-4/5 mb-12 -rotate-90 -mr-24 self-end text-xs z-50 text-discrete-grey brightness-50 font-light">
           {" "}
-          Kinds of Kindness (2024){" "}
+          {"Kinds of Kindness"} {`(${GetReleaseYear(bgGame)})`}
         </div>
         <div className="z-10 w-full max-w-5xl items-center justify-between text-3xl font-black flex flex-col  font-serif">
           {" "}
-          <h1> Track films you've watched. </h1>
-          <h1> Save those you want to see. </h1>
+          <h1> Track games you've played. </h1>
+          <h1> Save those you want to try. </h1>
           <h1> Tell your friends what's good. </h1>
         </div>
         <div className="flex rounded-md py-2 px-4 bg-accent-green hover:brightness-90">
@@ -75,8 +53,20 @@ export default function Home() {
           {" "}
           The social network for film lovers. Also avaialable on{" "}
         </div>
-        <TopFive />
-        <div> </div>
+        <div className="flex flex-row gap-8 h-fit w-fit">
+          <RowGames games={FeaturedGames} />
+        </div>
+        <div className="flex flex-row gap-16">
+          <Section header={"Popular Reviews this week"} className="basis-4/5">
+            <ReviewCard />
+            <ReviewCard />
+            <ReviewCard />
+            <ReviewCard />
+            <ReviewCard />
+            <ReviewCard />
+          </Section>
+          <Section header="Popular Reviewers" className="basis-1/4"></Section>
+        </div>
       </div>
     </main>
   );

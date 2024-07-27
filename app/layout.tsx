@@ -3,6 +3,7 @@ import Navbar from "@/components/navbar";
 import { Inter } from "next/font/google";
 import { NextUIProvider } from "@nextui-org/system";
 import "./globals.css";
+import Footer from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default async function RootLayout({
           <Navbar></Navbar>
         </div>
         {await children}
+        <Footer />
       </body>
     </html>
   );

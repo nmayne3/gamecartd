@@ -14,6 +14,7 @@ export interface Game {
   game_localizations: Array<Localizations>;
   alternative_names: Array<Descriptor>;
   similar_games: Array<Game>;
+  screenshots: Array<Picture>;
 }
 
 export interface Localizations {

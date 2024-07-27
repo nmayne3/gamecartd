@@ -1,22 +1,56 @@
+import { getAccessToken, client_id } from "./auth";
+import { Game } from "@/igdb/interfaces"
 
-
-const GetGame = async (): Promise<Game> => {
+export const GetGame = async (id: string): Promise<Game> => {
+    const access_token = getAccessToken();
+    console.log(
+      `Getting Game\nClient-ID: ${client_id}\nAuthorization: Bearer ${access_token}`
+    );
     const response = await fetch("https://api.igdb.com/v4/games", {
       method: "POST",
       headers: {
         Accept: "application/json",
-        "Client-ID": await auth.client_id,
-        Authorization: "Bearer " + (await auth.access_token),
+        "Client-ID": client_id,
+        Authorization: "Bearer " + access_token,
       },
-      body: `fields *, keywords.name, cover.*, artworks.*, genres.*, involved_companies.*; sort aggregated_rating desc; limit 1;`,
+      body: `fields *, similar_games.cover.*, similar_games.name, similar_games.slug, platforms.name, game_localizations.name, game_localizations.region.name, alternative_names.name, game_modes.name, keywords.name, themes.name, cover.*, artworks.*, screenshots.*, genres.*, involved_companies.*, involved_companies.company.name; where slug = "${id}"; limit 1;`,
     });
-    console.log("Slug page response status: " + response.status);
+    const clone = await response.clone().json();
+    console.log(response.status);
     // Authorization Error
-    if (response.status == 401) {
+    if (response.status == 401 || response.status == 400) {
       // Refresh token
-      console.log(await response.clone().json());
+      console.log(await response.json());
+      throw new Error("AHHH SLUGS");
+  
+      GetGame(id);
     }
-    const game = response.json();
-    return game;
-};
+    const game = await response.json();
+    console.log(game);
+    return await game[0];
+  };
+  
+export const GetGames = async ({fields, filter, sort, limit}: {fields: string, filter?: string, sort?: string, limit: number}): Promise<Array<Game>> => {
+    const access_token = getAccessToken();
+    console.log(
+      `Getting Game\nClient-ID: ${client_id}\nAuthorization: Bearer ${access_token}`
+    );
+    const response = await fetch("https://api.igdb.com/v4/games", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Client-ID": client_id,
+        Authorization: "Bearer " + access_token,
+      },
+      body: `fields ${fields}; where ${filter}; sort ${sort}; limit ${limit};`
+    });
+
+    console.log(response.status);
+    if(response.status != 200) {
+        console.log(await response.clone().json())
+    }
+    const games = await response.json();
+    console.log(games);
+    return games;
+}
   

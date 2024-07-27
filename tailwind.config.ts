@@ -30,6 +30,7 @@ const config: Config = {
         primary: '#14181C',
         secondary: '#445566',
         trimary: '#98AABB',
+        'dark-grey': '#2c3440',
         'header-light-grey': '#D8E0E8',
         'discrete-grey': '#9ab',
         'accent-green': '#00C030',

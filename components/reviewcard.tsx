@@ -4,7 +4,7 @@ import ProfilePicture from "@/assets/archie.jpg";
 
 export const ReviewCard = () => {
   return (
-    <div className="flex flex-row">
+    <section className="flex flex-row">
       {/** Profile Image / Left */}
       <Image
         src={ProfilePicture}
@@ -12,23 +12,23 @@ export const ReviewCard = () => {
         className="w-10 h-10 border-opacity-100 border-white outline-white/10 -outline-offset-1  outline-1 outline rounded-full aspect-square my-4"
       />
       {/** Review section on right */}
-      <div className="flex flex-col justify-start gap-4 p-4">
+      <div className="flex flex-col justify-start gap-4 p-4 text-sm">
         {/** Review Header */}
         <span className="text-xs flex flex-row gap-1 place-items-center">
           Review by
-          <span className="text-header-light-grey font-medium">
+          <h4 className="text-header-light-grey font-medium">
             {/** User Name */}
             Archie Bunker
-          </span>
+          </h4>
           {/** Star Rating */}
           <StarRating rating={4.5} />
           {/** CHECK IF USER LIKED THE MOVIE */}
           <FaHeart className="fill-accent-orange" />
           {/** Number of comments on review */}
-          <span className="flex flex-row place-items-center gap-0.5">
+          <h4 className="flex flex-row place-items-center gap-0.5">
             <FaComment className="fill-discrete-grey" />
             {"10"}
-          </span>
+          </h4>
         </span>
         {/** Review text */}
         <p className="">
@@ -39,12 +39,12 @@ export const ReviewCard = () => {
           being just as sorry as you are! so we’re both sorry, alright?”
         </p>
         {/** Number of likes on the review */}
-        <span className="flex flex-row gap-2 place-items-center">
+        <span className="flex flex-row gap-2 place-items-center text-xs">
           <FaHeart></FaHeart>
           {"7,382 likes"}
         </span>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -37,7 +37,7 @@ export const Authorize = async () => {
 };
 
 export const CheckAuthorization = async (request) => {
-  const session = request.cookies.get("session")?.value;
+  const session = await request.cookies.get("session")?.value;
   if (session) {
     console.log("Active session found");
     return;
