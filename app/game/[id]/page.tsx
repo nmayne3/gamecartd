@@ -46,9 +46,13 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
             id="Game Header"
             className="flex flex-row gap-2 items-baseline flex-wrap"
           >
-            {/** NAME */}
-            <h1 className="font-serif font-black text-2xl"> {game.name} </h1>
+            {/** Name */}
+            <h1 id="Game Name" className="font-serif font-black text-2xl">
+              {" "}
+              {game.name}{" "}
+            </h1>
             <h2 className="flex flex-row gap-1 text-sm flex-shrink-0 ">
+              {/** Release Date */}
               <time id="Release Year" className="text-white text-sm ">
                 {first_release_date.getFullYear()}
               </time>
@@ -58,11 +62,11 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
               </div>
             </h2>
           </header>
-          {/** Description */}
-          <section className="flex flex-row gap-8">
-            {/** Tagline */}
+          {/** Description Section */}
+          <div className="flex flex-row gap-8">
             <div className="flex flex-col basis-2/3 gap-4">
-              <div className="">
+              {/** Game Description */}
+              <section id="Description">
                 <div className="uppercase flex flex-row gap-2 flex-wrap pb-2">
                   {/** Do keywords as a tagline / Header? */}
                   {game.keywords &&
@@ -74,26 +78,29 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
                     ))}
                 </div>
                 <p className=""> {game.summary} </p>
-              </div>
-              <div>
-                <InfoTabs game={game} />
-              </div>
+              </section>
+              <InfoTabs game={game} />
             </div>
             {/** Right Side Column */}
             <aside className="basis-1/3">
-              <div className="flex w-full bg-secondary rounded-t-sm-md justify-center outline outline-0.5 outline-primary p-2">
-                {" "}
-                Sign in to log, rate or review{" "}
-              </div>
-              <div className="flex w-full bg-secondary rounded-b-sm-md justify-center outline outline-0.5 outline-primary p-2">
-                Share
-              </div>
-              <div className="flex w-full flex-row border-b border-secondary justify place-content-between uppercase items-baseline pt-4">
+              <section id="Review Buttons">
+                <h4 className="flex w-full bg-secondary rounded-t-sm-md justify-center outline outline-0.5 outline-primary p-2">
+                  {" "}
+                  Sign in to log, rate or review{" "}
+                </h4>
+                <h4 className="flex w-full bg-secondary rounded-b-sm-md justify-center outline outline-0.5 outline-primary p-2">
+                  Share
+                </h4>
+              </section>
+              <section
+                id="Quick Ratings"
+                className="flex w-full flex-row border-b border-secondary justify place-content-between uppercase items-baseline pt-4"
+              >
                 <div className="text-sm"> Ratings </div>
                 <div className="text-xs text-secondary"> 9 Fans </div>
-              </div>
+              </section>
             </aside>
-          </section>
+          </div>
           <Section header="Popular Reviews">
             <ReviewCard />
             <ReviewCard />

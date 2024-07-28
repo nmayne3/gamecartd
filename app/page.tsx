@@ -25,7 +25,7 @@ export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col max-w-screen-2xl items-center gap-8 mx-auto">
       {/** Backdrop Image Container */}
-      <div className="h-fit max-w-[1200px] bg-cover bg-top bg-no-repeat mask">
+      <figure className="h-fit max-w-[1200px] bg-cover bg-top bg-no-repeat mask">
         <Image
           src={`https://images.igdb.com/igdb/image/upload/t_1080p/${bg.image_id}.jpg`}
           width={bg.width}
@@ -33,13 +33,17 @@ export default async function Home() {
           alt={bgGame.name}
           className="z-0 object-cover aspect-video fade-in w-[1200px]"
         />
-      </div>
-      {/** Content */}
-      <div className="flex flex-col max-w-screen-lg w-5/6 gap-6 items-center -mt-72 z-10">
-        <div className=" basis-4/5 mb-12 -rotate-90 -mr-24 self-end text-xs z-50 text-discrete-grey brightness-50 font-light">
+        <figcaption
+          className="absolute text-xs text-discrete-grey/50 font-light z-50 rotate-180 top-1/3 right-10 "
+          style={{ writingMode: "vertical-rl" }}
+        >
           {" "}
-          {"Kinds of Kindness"} {`(${GetReleaseYear(bgGame)})`}
-        </div>
+          {bgGame.name}
+          {` (${GetReleaseYear(bgGame)})`}
+        </figcaption>
+      </figure>
+      {/** Content */}
+      <div className="flex flex-col max-w-screen-lg w-5/6 gap-6 items-center -mt-52 z-10">
         <div className="z-10 w-full max-w-5xl items-center justify-between text-3xl font-black flex flex-col  font-serif">
           {" "}
           <h1> Track games you've played. </h1>

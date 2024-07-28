@@ -11,6 +11,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        'xxs': '0.6rem'
+      },
       borderRadius: {
         'sm-md': "0.20rem"
       },
