@@ -1,4 +1,11 @@
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { Game } from "@/igdb/interfaces";
 import { GetGames, SearchGame, fetchSearchResults } from "@/igdb/api";
@@ -27,31 +34,31 @@ const Searchbar = () => {
     };
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     handleSearch(e.target.value);
-  };
+  }, []);
 
   const debounceResults = useMemo(() => {
     return debounce(handleChange, 300);
-  }, []);
+  }, [handleChange]);
 
   return (
     <section className="">
-      <div className="peer search-bar z-10 w-32 h-6 flex flex-row place-items-center rounded-full text-trimary bg-opacity-25 pointer-events-none bg-header-light-grey active:bg-white  focus-within:bg-white group-hover:bg-opacity-100">
+      <div className="peer group search-bar z-10 w-32 h-6 flex flex-row place-items-center rounded-full text-trimary bg-opacity-25 pointer-events-none bg-header-light-grey active:bg-white group-active:bg-white focus-within:bg-white group-hover:bg-opacity-100">
         <input
           onChange={debounceResults}
           name="SearchField"
           type="text"
           id="search"
-          className="w-full h-full pl-3 outline-none bg-transparent rounded-full group/search pointer-events-auto active:bg-white peer"
+          className="w-full h-full pl-3 outline-none bg-transparent rounded-full pointer-events-auto group-active:bg-white active:bg-white peer"
         />
-        <FaMagnifyingGlass className="mr-2.5 ml-1 scale-[140%] fill-header-light-grey group-hover:fill-trimary peer-focus:fill-trimary ">
+        <FaMagnifyingGlass className="mr-2.5 ml-1 scale-[140%] fill-header-light-grey group-hover:fill-trimary peer-focus:fill-trimary">
           {" "}
         </FaMagnifyingGlass>
       </div>
       {resultingGames.length > 0 && (
-        <div className="absolute mt-1 hidden peer-focus-within:block hover:block">
-          <ul className="bg-[#678] divide-y text-xxs divide-dark-grey rounded-md capitalize overflow-hidden">
+        <div className="absolute mt-1 hidden peer-focus-within:block hover:block drop-shadow-md">
+          <ul className="bg-menu-primary divide-y text-xxs divide-dark-grey rounded-md capitalize overflow-hidden">
             {resultingGames.map((game) => (
               <Link key={game.name} href={`/game/${game.slug}`}>
                 <SearchResult>

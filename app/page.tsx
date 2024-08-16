@@ -5,11 +5,13 @@ import "@/app/styles/home.css";
 import { FaEye, FaHeart } from "react-icons/fa6";
 import Link from "next/link";
 import RowGames from "@/components/rowgames";
-import { getAccessToken, client_id } from "@/igdb/auth";
+import { getAccessToken } from "@/igdb/auth";
+import { client_id } from "@/igdb/keys";
 import { Section } from "@/components/section";
 import { ReviewCard } from "@/components/reviewcard";
 import { GetGames } from "@/igdb/api";
 import { GetReleaseYear } from "@/igdb/helpers";
+import Backdrop from "@/components/backdrop";
 
 export default async function Home() {
   const FeaturedGames = await GetGames({
@@ -26,13 +28,7 @@ export default async function Home() {
     <main className="flex min-h-screen flex-col max-w-screen-2xl items-center gap-8 mx-auto">
       {/** Backdrop Image Container */}
       <figure className="h-fit max-w-[1200px] bg-cover bg-top bg-no-repeat mask">
-        <Image
-          src={`https://images.igdb.com/igdb/image/upload/t_1080p/${bg.image_id}.jpg`}
-          width={bg.width}
-          height={bg.height}
-          alt={bgGame.name}
-          className="z-0 object-cover aspect-video fade-in w-[1200px]"
-        />
+        <Backdrop bg={bg} name={bgGame.name}></Backdrop>
         <figcaption
           className="absolute text-xs text-discrete-grey/50 font-light z-50 rotate-180 top-1/3 right-10 "
           style={{ writingMode: "vertical-rl" }}
@@ -46,12 +42,12 @@ export default async function Home() {
       <div className="flex flex-col max-w-screen-lg w-5/6 gap-6 items-center -mt-52 z-10">
         <div className="z-10 w-full max-w-5xl items-center justify-between text-3xl font-black flex flex-col  font-serif">
           {" "}
-          <h1> Track games you've played. </h1>
+          <h1> {`Track games you've played.`} </h1>
           <h1> Save those you want to try. </h1>
-          <h1> Tell your friends what's good. </h1>
+          <h1> {`Tell your friends what's good.`} </h1>
         </div>
         <div className="flex rounded-md py-2 px-4 bg-accent-green hover:brightness-90">
-          <h1 className="font-bold">Get started - it's free!</h1>
+          <h1 className="font-bold">{`Get started - it's free!`}</h1>
         </div>
         <div className="text-sm">
           {" "}

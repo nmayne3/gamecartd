@@ -92,10 +92,12 @@ const DetailList = ({
             descriptor && (
               <div
                 key={descriptor.id}
-                className="bg-secondary rounded-sm-md p-1 shadow-inner whitespace-nowrap"
+                className="bg-secondary/75 rounded-sm-md pt-[0.06rem] shadow-inner whitespace-nowrap overflow-hidden hover:brightness-125"
               >
-                {" "}
-                {descriptor.name}{" "}
+                <div className="p-1 bg-dark-grey rounded-sm-md">
+                  {" "}
+                  {descriptor.name}{" "}
+                </div>
               </div>
             )
         )}{" "}
@@ -109,6 +111,10 @@ const CompaniesTab = ({ companies }: { companies: Array<Company> }) => {
   const publishers = [];
   const porters = [];
   const supporting = [];
+
+  if (!companies) {
+    return;
+  }
 
   for (const company of companies) {
     if (company.porting) {

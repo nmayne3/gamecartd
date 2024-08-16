@@ -1,5 +1,4 @@
 import { GetGames } from "@/igdb/api";
-import { Game } from "@/igdb/interfaces";
 import { Section } from "@/components/section";
 import RowGames from "@/components/rowgames";
 import BrowseMenu from "@/components/browsemenu";

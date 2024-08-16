@@ -2,11 +2,13 @@ import Image from "next/image";
 import "@/app/styles/home.css";
 import BoxArt from "@/components/boxart";
 import { Game, Picture, Descriptor, Company } from "@/igdb/interfaces";
-import { getAccessToken, client_id } from "@/igdb/auth";
+import { getAccessToken } from "@/igdb/auth";
+import { client_id } from "@/igdb/keys";
 import { InfoTabs } from "@/components/infotabs";
 import { Section } from "@/components/section";
 import { ReviewCard } from "@/components/reviewcard";
 import RowGames from "@/components/rowgames";
+import Backdrop from "@/components/backdrop";
 
 const GamePage = async ({ params }: { params: { id: string } }) => {
   const id = params.id;
@@ -15,23 +17,15 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
   const bg = GetBackgroundImage(game);
   const first_release_date = new Date(game.first_release_date * 1000);
   const developer_name = await GetDeveloperName(game);
-  for (const genre of game.genres) {
-    console.log(genre.name);
-  }
+
   return (
     <main className="flex min-h-screen flex-col max-w-screen-xl m-auto items-center gap-8">
       {/** Backdrop Image Container */}
       <section
         id="Backdrop Image Container"
-        className="h-fit max-w-[1200px] bg-cover bg-top bg-no-repeat mask"
+        className="h-fit max-w-[1200px] w-[1200px] aspect-video bg-cover bg-top bg-no-repeat mask"
       >
-        <Image
-          src={`https://images.igdb.com/igdb/image/upload/t_1080p/${bg.image_id}.jpg`}
-          width={bg.width}
-          height={bg.height}
-          alt={game.name}
-          className="z-0 object-cover aspect-video fade-in w-[1200px]"
-        />
+        {bg && <Backdrop bg={bg} name={game.name} />}
       </section>
       {/** Content */}
       <div className="flex flex-row max-w-3xl -mt-48 mx-auto place-items-start gap-8 h-fit pb-4 z-10">
@@ -77,7 +71,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
                       </h3>
                     ))}
                 </div>
-                <p className=""> {game.summary} </p>
+                {game.summary && <p className=""> {game.summary} </p>}
               </section>
               <InfoTabs game={game} />
             </div>
@@ -151,7 +145,10 @@ const GetGame = async (id: string): Promise<Game> => {
 
 const GetDeveloperName = async (game: Game) => {
   let name = "";
-  for (const company of await game.involved_companies) {
+  if (!game.involved_companies) {
+    return "Unknown";
+  }
+  for (const company of game.involved_companies) {
     if (company.developer == true) {
       name = company.company.name;
     }

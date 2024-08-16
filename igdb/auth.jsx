@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-
-export const client_id = "ooht58l1atsq8jiilhqg8ohq5827aw";
+import { client_id, client_secret } from "@/igdb/keys";
 
 var expire_time = new Date();
 
@@ -12,7 +11,7 @@ export async function encrypt(payload) {
 
 const fetchToken = async () => {
   return await fetch(
-    "https://id.twitch.tv/oauth2/token?client_id=ooht58l1atsq8jiilhqg8ohq5827aw&client_secret=6oi55453w0ukfs34o3wpzzcw5uqz05&grant_type=client_credentials",
+    `https://id.twitch.tv/oauth2/token?client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials`,
     {
       method: "POST",
     }
@@ -21,7 +20,7 @@ const fetchToken = async () => {
 
 export const Authorize = async () => {
   const response = await fetch(
-    "https://id.twitch.tv/oauth2/token?client_id=ooht58l1atsq8jiilhqg8ohq5827aw&client_secret=6oi55453w0ukfs34o3wpzzcw5uqz05&grant_type=client_credentials",
+    `https://id.twitch.tv/oauth2/token?client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials`,
     {
       method: "POST",
     }
@@ -38,14 +37,14 @@ export const Authorize = async () => {
 
 export const CheckAuthorization = async (request) => {
   const session = await request.cookies.get("session")?.value;
+  const response = NextResponse.next();
   if (session) {
     console.log("Active session found");
-    return;
+    return response;
   }
 
   console.log("Generating new token");
   // Get a new token if no active one
-  const response = NextResponse.next();
   const data = await fetchToken();
   const auth = await data.json();
   const expiry = Date.now() + (await auth.expires_in) * 1000;

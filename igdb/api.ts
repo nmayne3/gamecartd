@@ -1,6 +1,7 @@
 "use server"
 
-import { getAccessToken, client_id } from "./auth";
+import { getAccessToken } from "./auth";
+import { client_id } from "./keys";
 import { Game } from "@/igdb/interfaces"
 
 export const GetGame = async (id: string): Promise<Game> => {
@@ -32,19 +33,21 @@ export const GetGame = async (id: string): Promise<Game> => {
     return await game[0];
   };
   
-export const GetGames = async ({fields, filter, sort, limit, search}: {fields: string, filter?: string, sort?: string, limit: number, search?: string}): Promise<Array<Game>> => {
+export const GetGames = async ({endpoint, fields, filter, sort, limit, offset}: {endpoint?: string; fields: string, filter?: string, sort?: string, limit: number, offset?: number}): Promise<Array<Game>> => {
     const access_token = getAccessToken();
     console.log(
       `Getting Game\nClient-ID: ${client_id}\nAuthorization: Bearer ${access_token}`
     );
-    const response = await fetch("https://api.igdb.com/v4/games", {
+    endpoint = endpoint ? endpoint : "games";
+    offset = offset ? offset : 0;
+    const response = await fetch(`https://api.igdb.com/v4/${endpoint}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Client-ID": client_id,
         Authorization: "Bearer " + access_token,
       },
-      body: `fields ${fields}; where ${filter}; sort ${sort}; limit ${limit};`
+      body: `fields ${fields}; where ${filter}; sort ${sort}; limit ${limit}; offset ${offset};`
     });
 
     console.log(response.status);

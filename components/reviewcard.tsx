@@ -33,10 +33,10 @@ export const ReviewCard = () => {
         {/** Review text */}
         <p className="">
           {" "}
-          “i'm sorry too, dimitri. i’m very sorry. all right, you're sorrier
+          {`“i'm sorry too, dimitri. i’m very sorry. all right, you're sorrier
           than i am! but i am sorry as well. i am as sorry as you are dimitri,
           don't say that you're more sorry than i am because i'm capable of
-          being just as sorry as you are! so we’re both sorry, alright?”
+          being just as sorry as you are! so we’re both sorry, alright?”`}
         </p>
         {/** Number of likes on the review */}
         <span className="flex flex-row gap-2 place-items-center text-xs">

@@ -38,7 +38,8 @@ const config: Config = {
         'discrete-grey': '#9ab',
         'accent-green': '#00C030',
         'accent-green-alt': '#00e054',
-        'accent-orange': '#EE7000'
+        'accent-orange': '#EE7000',
+        'menu-primary': '#678'
       }
     },
   },
