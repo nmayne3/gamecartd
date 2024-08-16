@@ -56,15 +56,15 @@ const Navbar = () => {
             className="w-10 h-6 p-0.5 flex flex-col justify-between relative z-50"
             onClick={() => setOpen(!open)}
           >
-            <div className="w-8 h-1 bg-primary rounded-md"></div>
-            <div className="w-8 h-1 bg-primary rounded-md"></div>
-            <div className="w-8 h-1 bg-primary rounded-md"></div>
+            <div className="w-8 h-1 bg-white rounded-md"></div>
+            <div className="w-8 h-1 bg-white rounded-md"></div>
+            <div className="w-8 h-1 bg-white rounded-md"></div>
           </button>
           {/* MENU LIST */}
           {open && (
             <nav
               id="Mobile Nav Listing"
-              className="absolute top-0 left-0 w-full h-full bg-secondary text-primary flex flex-col items-center justify-center gap-8"
+              className="fixed top-0 h-screen left-0 z-40 w-full bg-secondary text-primary flex flex-col items-center justify-center gap-8"
             >
               {links.map((link) => (
                 <Link

@@ -29,9 +29,9 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
         {bg && <Backdrop bg={bg} name={game.name} />}
       </section>
       {/** Content */}
-      <div className="flex flex-row max-w-3xl -mt-48 mx-auto place-items-start gap-8 h-fit pb-4 z-10">
+      <div className="md:flex md:flex-row max-w-3xl -mt-48 mx-auto place-items-start gap-8 h-fit p-4 lg:p-0 lg:pb-4 pb-4 z-10">
         {/** Boxart LEFT SIDE */}
-        <figure className="basis-1/4 flex-shrink-0 h-fit sticky top-4">
+        <figure className="hidden md:flex flex-col basis-1/4 flex-shrink-0 h-fit md:sticky md:top-4">
           <BoxArt game={game} />
           <span className="flex flex-row self-center text-xs items-center justify-center gap-2 p-2">
             <FaEye className="fill-accent-green" />
@@ -44,27 +44,36 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
         </figure>
         {/** Info Middle Column */}
         <div className="flex flex-col text-xs w-fit mx-auto gap-4 basis-3/4 ">
-          {/** Name and developer */}
-          <header
-            id="Game Header"
-            className="flex flex-row gap-2 items-baseline flex-wrap"
-          >
-            {/** Name */}
-            <h1 id="Game Name" className="font-serif font-black text-2xl">
-              {" "}
-              {game.name}{" "}
-            </h1>
-            <h2 className="flex flex-row gap-1 text-sm flex-shrink-0 ">
-              {/** Release Date */}
-              <time id="Release Year" className="text-white text-sm ">
-                {first_release_date.getFullYear()}
-              </time>
-              {/** Developer Name */} Developed by{" "}
-              <div id="Developer Name" className="text-white">
-                {developer_name}{" "}
-              </div>
-            </h2>
-          </header>
+          <div className="flex flex-row justify-between">
+            {/** Name and developer */}
+            <header
+              id="Game Header"
+              className="flex flex-col items-start justify-center md:justify-start md:flex-row gap-2 md:items-baseline md:flex-wrap basis-2/3 md:basis-full"
+            >
+              {/** Name */}
+              <h1 id="Game Name" className="font-serif font-black text-2xl">
+                {" "}
+                {game.name}{" "}
+              </h1>
+              <h2 className="flex flex-col-reverse md:flex-row gap-1 text-sm flex-shrink-0 ">
+                {/** Release Date */}
+                <time id="Release Year" className="text-white text-sm">
+                  {first_release_date.getFullYear()}
+                </time>
+
+                {/** Developer Name */}
+                <div className="flex flex-col md:flex-row md:gap-1">
+                  Developed by{" "}
+                  <div id="Developer Name" className="text-white">
+                    {developer_name}{" "}
+                  </div>
+                </div>
+              </h2>
+            </header>
+            <figure className="md:hidden basis-1/4">
+              <BoxArt game={game} />
+            </figure>
+          </div>
           {/** Description Section */}
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex flex-col basis-2/3 gap-4">

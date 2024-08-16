@@ -21,7 +21,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <div className="h-12 z-50 absolute w-full">
-          <Navbar></Navbar>
+          <Navbar />
         </div>
         {await children}
         <Footer />
