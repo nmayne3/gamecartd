@@ -49,10 +49,7 @@ export default async function Home() {
         <div className="flex rounded-md py-2 px-4 bg-accent-green hover:brightness-90">
           <h1 className="font-bold">{`Get started - it's free!`}</h1>
         </div>
-        <div className="text-sm">
-          {" "}
-          The social network for film lovers. Also avaialable on{" "}
-        </div>
+        <div className="text-sm"> The social network for game lovers. </div>
         <div className="flex flex-row gap-8 h-fit w-fit">
           <RowGames games={FeaturedGames} />
         </div>
