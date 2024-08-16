@@ -8,6 +8,7 @@ import { InfoTabs } from "@/components/infotabs";
 import { Section } from "@/components/section";
 import { ReviewCard } from "@/components/reviewcard";
 import RowGames from "@/components/rowgames";
+import { FaEye, FaHeart, FaBoxesStacked } from "react-icons/fa6";
 import Backdrop from "@/components/backdrop";
 
 const GamePage = async ({ params }: { params: { id: string } }) => {
@@ -23,15 +24,23 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
       {/** Backdrop Image Container */}
       <section
         id="Backdrop Image Container"
-        className="h-fit max-w-[1200px] w-[1200px] aspect-video bg-cover bg-top bg-no-repeat mask"
+        className="h-fit max-w-[1200px] aspect-video bg-cover bg-top bg-no-repeat mask"
       >
         {bg && <Backdrop bg={bg} name={game.name} />}
       </section>
       {/** Content */}
       <div className="flex flex-row max-w-3xl -mt-48 mx-auto place-items-start gap-8 h-fit pb-4 z-10">
         {/** Boxart LEFT SIDE */}
-        <figure className="basis-1/4 flex-shrink-0 h-fit">
+        <figure className="basis-1/4 flex-shrink-0 h-fit sticky top-4">
           <BoxArt game={game} />
+          <span className="flex flex-row self-center text-xs items-center justify-center gap-2 p-2">
+            <FaEye className="fill-accent-green" />
+            {"427k"}
+            <FaBoxesStacked className="fill-blue-400" />
+            {"78k"}
+            <FaHeart className="fill-accent-orange" />
+            {"139k"}
+          </span>
         </figure>
         {/** Info Middle Column */}
         <div className="flex flex-col text-xs w-fit mx-auto gap-4 basis-3/4 ">
@@ -57,7 +66,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
             </h2>
           </header>
           {/** Description Section */}
-          <div className="flex flex-row gap-8">
+          <div className="flex flex-col md:flex-row gap-8">
             <div className="flex flex-col basis-2/3 gap-4">
               {/** Game Description */}
               <section id="Description">
