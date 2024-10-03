@@ -40,10 +40,10 @@ export default async function Home() {
       </figure>
       {/** Content */}
       <div className="flex flex-col max-w-screen-lg w-5/6 gap-6 items-center -mt-52 z-10">
-        <div className="z-10 w-full max-w-5xl items-center justify-between text-3xl font-black flex flex-col  font-serif">
+        <div className="z-10 w-full max-w-5xl items-center justify-between text-3xl font-black flex flex-col font-dm-serif">
           {" "}
           <h1> {`Track games you've played.`} </h1>
-          <h1> Save those you want to try. </h1>
+          <h1> {`Save those you want to try.`} </h1>
           <h1> {`Tell your friends what's good.`} </h1>
         </div>
         <div className="flex rounded-md py-2 px-4 bg-accent-green hover:brightness-90">

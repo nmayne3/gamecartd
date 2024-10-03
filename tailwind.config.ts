@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss";
 const {nextui} = require("@nextui-org/theme");
 
 
+
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -11,6 +12,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'dm-serif': ['var(--font-dm-serif)'],
+      },
       fontSize: {
         'xxs': '0.6rem'
       },

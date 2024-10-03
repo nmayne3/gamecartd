@@ -2,8 +2,8 @@ import { FaLinkedin, FaGithub } from "react-icons/fa6";
 
 const Footer = () => {
   return (
-    <footer className="w-full h-24 bg-dark-grey place-content-center">
-      <div className="flex flex-row gap-16 place-items-center justify-center max-w-screen-md m-auto p-">
+    <footer className="w-full h-32 bg-dark-grey  flex flex-col flex-grow">
+      <div className="flex flex-row gap-16 max-w-screen-md mx-auto my-8">
         <div className="flex flex-row gap-2 font-semibold text-sm">
           <h4>{"About  "}</h4>
           <h4> Contact </h4>

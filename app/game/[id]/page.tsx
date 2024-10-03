@@ -10,6 +10,24 @@ import { ReviewCard } from "@/components/reviewcard";
 import RowGames from "@/components/rowgames";
 import { FaEye, FaHeart, FaBoxesStacked } from "react-icons/fa6";
 import Backdrop from "@/components/backdrop";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  // read route params
+  const id = params.id;
+  const game = await GetGame(id);
+  const bg = GetBackgroundImage(game);
+  const first_release_date = new Date(game.first_release_date * 1000);
+  const developer_name = await GetDeveloperName(game);
+
+  return {
+    title: `${game.name} (${first_release_date.getFullYear()})`,
+  };
+}
 
 const GamePage = async ({ params }: { params: { id: string } }) => {
   const id = params.id;
@@ -43,7 +61,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
           </span>
         </figure>
         {/** Info Middle Column */}
-        <div className="flex flex-col text-xs w-fit mx-auto gap-4 basis-3/4 ">
+        <div className="flex flex-col text-xs xl:text-medium w-fit mx-auto gap-4 basis-3/4 ">
           <div className="flex flex-row justify-between">
             {/** Name and developer */}
             <header
@@ -51,13 +69,16 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
               className="flex flex-col items-start justify-center md:justify-start md:flex-row gap-2 md:items-baseline md:flex-wrap basis-2/3 md:basis-full"
             >
               {/** Name */}
-              <h1 id="Game Name" className="font-serif font-black text-2xl">
+              <h1
+                id="Game Name"
+                className="font-dm-serif font-black text-2xl xl:text-3xl"
+              >
                 {" "}
                 {game.name}{" "}
               </h1>
-              <h2 className="flex flex-col-reverse md:flex-row gap-1 text-sm flex-shrink-0 ">
+              <h2 className="flex flex-col-reverse md:flex-row gap-1 text-sm flex-shrink-0 xl:text-lg">
                 {/** Release Date */}
-                <time id="Release Year" className="text-white text-sm">
+                <time id="Release Year" className="text-white">
                   {first_release_date.getFullYear()}
                 </time>
 

@@ -15,7 +15,7 @@ export const InfoTabs = ({ game }: { game: Game }) => {
         tabList: "border-b gap-4 p-0 m-0 w-full border-secondary h-fit",
         tab: "uppercase justify-start p-0 py-0.5 m-0 w-fit h-fit ",
         tabContent:
-          "text-accent-green-alt text-xs group-data-[selected=true]:text-white p-0",
+          "text-accent-green-alt group-data-[selected=true]:text-white p-0",
         cursor: "w-full p-0 bg-white",
       }}
     >
@@ -76,7 +76,7 @@ const DetailList = ({
 }) => {
   if (!descriptors || descriptors.length < 1) return;
   return (
-    <div className="flex flex-row w-full gap-2 items-baseline baseline py-2">
+    <div className="flex flex-row w-full gap-2 items-baseline baseline py-2 text-xs">
       {/** descriptor type */}
       <div className="flex flex-row basis-2/5 gap-1 uppercase text-secondary max-w-full ">
         {" "}

@@ -142,6 +142,9 @@ p {
 body {
   @apply text-trimary;
   @apply bg-primary;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 @layer utilities {
@@ -152,4 +155,29 @@ body {
 
 .smooth-transition {
   transition: 0.2s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.text-field {
+  border-radius: 8px;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top:1rem;
+  padding-bottom: 1rem;
+  outline: transparent;
+  font-weight: 350;
+
+  @apply bg-header-light-grey;
+  @apply bg-opacity-25;  
+}
+
+.text-field:hover{
+  @apply bg-opacity-100;
+}
+
+.text-field:active{
+  background-color: white;
+  
+}
+.text-field:focus{
+  background-color: white;
 }

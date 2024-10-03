@@ -31,11 +31,7 @@ const GamesFunPage = async ({ params }: { params: { slug: string[] } }) => {
     console.log(`${param.field}: ${param.value}`);
   }
 
-  return (
-    <div className="min-h-screen w-full h-full py-24 text-center">
-      Slug city baby
-    </div>
-  );
+  return <div className="w-full h-full py-24 text-center">Slug city baby</div>;
 };
 
 export default GamesFunPage;

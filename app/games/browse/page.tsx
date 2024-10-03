@@ -8,6 +8,12 @@ import { useMemo } from "react";
 import { SectionHeader } from "@/components/section";
 import Button from "@/components/button";
 import PageButtons from "@/components/pagebutton";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Games • Gamecartd",
+  description: "Get your game on",
+};
 
 const BrowsePage = async ({
   searchParams,
