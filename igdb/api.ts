@@ -1,19 +1,25 @@
 "use server"
 
 import { getAccessToken } from "./auth";
-import { client_id } from "./keys";
 import { Game } from "@/igdb/interfaces"
 
 export const GetGame = async (id: string): Promise<Game> => {
     const access_token = getAccessToken();
+    if (
+      process.env.client_id === undefined ||
+      process.env.client_secret === undefined
+    ) {
+      throw new Error('Invalid env vars');
+    }
+    
     console.log(
-      `Getting Game\nClient-ID: ${client_id}\nAuthorization: Bearer ${access_token}`
+      `Getting Game\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${process.env.access_token}`
     );
     const response = await fetch("https://api.igdb.com/v4/games", {
       method: "POST",
       headers: {
         Accept: "application/json",
-        "Client-ID": client_id,
+        "Client-ID": process.env.client_id,
         Authorization: "Bearer " + access_token,
       },
       body: `fields *, similar_games.cover.*, similar_games.name, similar_games.slug, platforms.name, game_localizations.name, game_localizations.region.name, alternative_names.name, game_modes.name, keywords.name, themes.name, cover.*, artworks.*, screenshots.*, genres.*, involved_companies.*, involved_companies.company.name; where slug = "${id}"; limit 1;`,
@@ -35,8 +41,16 @@ export const GetGame = async (id: string): Promise<Game> => {
   
 export const GetGames = async ({endpoint, fields, filter, sort, limit, offset}: {endpoint?: string; fields: string, filter?: string, sort?: string, limit: number, offset?: number}): Promise<Array<Game>> => {
     const access_token = getAccessToken();
+    
+    if (
+      process.env.client_id === undefined ||
+      process.env.client_secret === undefined
+    ) {
+      throw new Error('Invalid env vars');
+    }
+
     console.log(
-      `Getting Game\nClient-ID: ${client_id}\nAuthorization: Bearer ${access_token}`
+      `Getting Game\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${process.env.access_token}`
     );
     endpoint = endpoint ? endpoint : "games";
     offset = offset ? offset : 0;
@@ -44,7 +58,7 @@ export const GetGames = async ({endpoint, fields, filter, sort, limit, offset}: 
       method: "POST",
       headers: {
         Accept: "application/json",
-        "Client-ID": client_id,
+        "Client-ID": process.env.client_id,
         Authorization: "Bearer " + access_token,
       },
       body: `fields ${fields}; where ${filter}; sort ${sort}; limit ${limit}; offset ${offset};`
@@ -61,15 +75,23 @@ export const GetGames = async ({endpoint, fields, filter, sort, limit, offset}: 
 
 export const SearchGame = async ({search, fields, filter, limit}: {search: string, fields: string, filter?: string, limit: number}): Promise<Array<Game>> => {
     const access_token = getAccessToken();
+    if (
+      process.env.client_id === undefined ||
+      process.env.client_secret === undefined
+    ) {
+      throw new Error('Invalid env vars');
+    }
+
     console.log(
-      `Getting Game\nClient-ID: ${client_id}\nAuthorization: Bearer ${access_token}`
+      `Getting Game\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${access_token}`
     );
        
     const response = await fetch("https://api.igdb.com/v4/games", {
+      
       method: "POST",
       headers: {
       Accept: "application/json",
-        "Client-ID": client_id,
+        "Client-ID": process.env.client_id,
         Authorization: "Bearer " + access_token,
       },
       body: `fields ${fields}; where version_parent = null & name ~ *"${search}"*; sort rating desc; limit ${limit};`

@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { client_id, client_secret } from "@/igdb/keys";
 
 var expire_time = new Date();
 
@@ -11,7 +10,7 @@ export async function encrypt(payload) {
 
 const fetchToken = async () => {
   return await fetch(
-    `https://id.twitch.tv/oauth2/token?client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials`,
+    `https://id.twitch.tv/oauth2/token?client_id=${process.env.client_id}&client_secret=${process.env.client_secret}&grant_type=client_credentials`,
     {
       method: "POST",
     }
@@ -19,8 +18,14 @@ const fetchToken = async () => {
 };
 
 export const Authorize = async () => {
+  if (
+    process.env.client_id === undefined ||
+    process.env.client_secret === undefined
+  ) {
+    throw new Error("Invalid env vars");
+  }
   const response = await fetch(
-    `https://id.twitch.tv/oauth2/token?client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials`,
+    `https://id.twitch.tv/oauth2/token?client_id=${process.env.client_id}&client_secret=${process.env.client_secret}&grant_type=client_credentials`,
     {
       method: "POST",
     }

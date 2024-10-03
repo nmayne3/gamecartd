@@ -157,6 +157,14 @@ export default GamePage;
 
 const GetGame = async (id: string): Promise<Game> => {
   const access_token = getAccessToken();
+
+  if (
+    process.env.client_id === undefined ||
+    process.env.client_secret === undefined
+  ) {
+    throw new Error("Invalid env vars");
+  }
+
   console.log(
     `No slug city\nClient-ID: ${client_id}\nAuthorization: Bearer ${access_token}`
   );
@@ -164,7 +172,7 @@ const GetGame = async (id: string): Promise<Game> => {
     method: "POST",
     headers: {
       Accept: "application/json",
-      "Client-ID": client_id,
+      "Client-ID": process.env.client_id,
       Authorization: "Bearer " + access_token,
     },
     body: `fields *, similar_games.cover.*, similar_games.name, similar_games.slug, platforms.name, game_localizations.name, game_localizations.region.name, alternative_names.name, game_modes.name, keywords.name, themes.name, cover.*, artworks.*, screenshots.*, genres.*, involved_companies.*, involved_companies.company.name; where slug = "${id}"; limit 1;`,
