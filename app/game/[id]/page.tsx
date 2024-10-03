@@ -3,7 +3,6 @@ import "@/app/styles/home.css";
 import BoxArt from "@/components/boxart";
 import { Game, Picture, Descriptor, Company } from "@/igdb/interfaces";
 import { getAccessToken } from "@/igdb/auth";
-import { client_id } from "@/igdb/keys";
 import { InfoTabs } from "@/components/infotabs";
 import { Section } from "@/components/section";
 import { ReviewCard } from "@/components/reviewcard";
@@ -166,7 +165,7 @@ const GetGame = async (id: string): Promise<Game> => {
   }
 
   console.log(
-    `No slug city\nClient-ID: ${client_id}\nAuthorization: Bearer ${access_token}`
+    `No slug city\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${access_token}`
   );
   const response = await fetch("https://api.igdb.com/v4/games", {
     method: "POST",

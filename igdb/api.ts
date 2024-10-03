@@ -13,7 +13,7 @@ export const GetGame = async (id: string): Promise<Game> => {
     }
     
     console.log(
-      `Getting Game\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${process.env.access_token}`
+      `Getting Game\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${access_token}`
     );
     const response = await fetch("https://api.igdb.com/v4/games", {
       method: "POST",
@@ -50,7 +50,7 @@ export const GetGames = async ({endpoint, fields, filter, sort, limit, offset}: 
     }
 
     console.log(
-      `Getting Game\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${process.env.access_token}`
+      `Getting Game\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${access_token}`
     );
     endpoint = endpoint ? endpoint : "games";
     offset = offset ? offset : 0;
