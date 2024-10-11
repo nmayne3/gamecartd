@@ -9,6 +9,12 @@ const nextConfig = {
                 hostname: "images.igdb.com",
                 port: '',
                 pathname: '/igdb/image/upload/**'
+            },
+            {  
+                protocol: 'https',
+                hostname: "cdn.discordapp.com",
+                port: '',
+                pathname: '/avatars/**'
             },        
         ],
     },

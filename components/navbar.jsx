@@ -6,6 +6,10 @@ import Link from "next/link";
 import Searchbar from "./searchbar";
 import { useState } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import Image from "next/image";
+import { DropdownTab } from "./dropdown";
 
 const links = [
   { url: "/games", title: "Games" },
@@ -16,11 +20,12 @@ const links = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const pathName = usePathname();
+  const session = useSession();
   return (
     <header className="h-full w-full font-medium z-50 navbar group pointer-events-auto pt-1">
       <div className="h-full w-full mx-auto max-w-screen-xl flex items-center group justify-between px-4 sm:px-8 md:px-12 lg:px-20 xl:px-36">
         {/* Home Button / Logo */}
-        <h1 className="font-bold z-50">
+        <h1 className="font-bold font-sans z-50">
           <Link
             href={"/"}
             className="text-2xl text-white rounded-md p-1 flex items-center justify-center"
@@ -29,9 +34,35 @@ const Navbar = () => {
           </Link>
         </h1>
         {/* Website Directory */}
-        <nav className="hidden md:flex flex-row items-center justify-center gap-4 header-text z-50">
-          <div className="hover:text-white"> Sign In </div>
-          <div className="hover:text-white"> Create Account </div>
+        <nav className="hidden md:flex flex-row items-center justify-center gap-4 header-text z-50 uppercase">
+          {/** Login Section */}
+          {session.status != "authenticated" && (
+            <Link href={"/login"} className="hover:text-white">
+              {" "}
+              Sign In{" "}
+            </Link>
+          )}
+          {session.status != "authenticated" && (
+            <div className="hover:text-white"> Create Account </div>
+          )}
+          {/** Profile Section */}
+          {session.status == "authenticated" && (
+            <div className="uppercase flex flex-row gap-2 place-items-center">
+              <DropdownTab
+                name={session.data.user?.name}
+                icon_src={session.data.user?.image}
+              >
+                <button
+                  className="uppercase w-full text-left"
+                  onClick={() => signOut()}
+                >
+                  {" "}
+                  Log Out{" "}
+                </button>
+              </DropdownTab>
+            </div>
+          )}
+          {/** Directory Section */}
           {links.map((link) => (
             <Link
               href={link.url}

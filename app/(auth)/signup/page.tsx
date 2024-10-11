@@ -1,6 +1,7 @@
 import Button from "@/components/button";
 import Image from "next/image";
 import HeroImage from "@/assets/ltp.jpg";
+import prisma from "@/lib/prisma";
 
 const SignUp = () => {
   return (

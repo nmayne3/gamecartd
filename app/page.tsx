@@ -12,6 +12,7 @@ import { ReviewCard } from "@/components/reviewcard";
 import { GetGames } from "@/igdb/api";
 import { GetReleaseYear } from "@/igdb/helpers";
 import Backdrop from "@/components/backdrop";
+import { getSession } from "./api/auth/[...nextauth]/auth";
 
 export default async function Home() {
   const FeaturedGames = await GetGames({
@@ -23,7 +24,7 @@ export default async function Home() {
   });
   const bgGame = FeaturedGames[0];
   const bg = bgGame.artworks[0];
-
+  const session = await getSession();
   return (
     <main className="flex min-h-screen flex-col max-w-screen-2xl items-center gap-8 mx-auto">
       {/** Backdrop Image Container */}
@@ -40,16 +41,30 @@ export default async function Home() {
       </figure>
       {/** Content */}
       <div className="flex flex-col max-w-screen-lg w-5/6 gap-6 items-center -mt-52 z-10">
-        <div className="z-10 w-full max-w-5xl items-center justify-between text-3xl font-black flex flex-col font-dm-serif">
-          {" "}
-          <h1> {`Track games you've played.`} </h1>
-          <h1> {`Save those you want to try.`} </h1>
-          <h1> {`Tell your friends what's good.`} </h1>
-        </div>
-        <div className="flex rounded-md py-2 px-4 bg-accent-green hover:brightness-90">
-          <h1 className="font-bold">{`Get started - it's free!`}</h1>
-        </div>
-        <div className="text-sm"> The social network for game lovers. </div>
+        {!session && (
+          <div className="flex flex-col gap-6 items-center">
+            <div className="z-10 w-full max-w-5xl items-center justify-between text-3xl font-black flex flex-col font-dm-serif">
+              {" "}
+              <h1> {`Track games you've played.`} </h1>
+              <h1> {`Save those you want to try.`} </h1>
+              <h1> {`Tell your friends what's good.`} </h1>
+            </div>
+            <Link
+              href="/login"
+              className="flex rounded-md py-2 px-4 bg-accent-green hover:brightness-90"
+            >
+              <h1 className="font-bold">{`Get started - it's free!`}</h1>
+            </Link>
+            <div className="text-sm"> The social network for game lovers. </div>
+          </div>
+        )}
+        {session && (
+          <div className="items-center text-center">
+            <h1> Welcome {session.user?.name}, </h1>
+            <h2> Here's what we've been playing. </h2>
+          </div>
+        )}
+
         <div className="flex flex-row gap-8 h-fit w-fit">
           <RowGames games={FeaturedGames} />
         </div>

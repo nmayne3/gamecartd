@@ -54,7 +54,7 @@ const BrowsePage = async ({
   );
 
   return (
-    <main className="w-full min-h-screen">
+    <main className="w-full">
       <header id="Header Filler Block" className="w-full h-12 bg-primary" />
       <section className="max-w-screen-lg h-full w-full flex flex-col justify-self-center mx-auto divide-y divide-secondary py-8">
         {/** Header with Filter Menu */}
