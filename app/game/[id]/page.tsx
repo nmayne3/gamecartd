@@ -7,9 +7,16 @@ import { InfoTabs } from "@/components/infotabs";
 import { Section } from "@/components/section";
 import { ReviewCard } from "@/components/reviewcard";
 import RowGames from "@/components/rowgames";
-import { FaEye, FaHeart, FaBoxesStacked } from "react-icons/fa6";
+import {
+  FaEye,
+  FaHeart,
+  FaBoxesStacked,
+  FaRegCalendarPlus,
+  FaStar,
+} from "react-icons/fa6";
 import Backdrop from "@/components/backdrop";
 import type { Metadata } from "next";
+import { getSession } from "@/app/api/auth/[...nextauth]/auth";
 
 export async function generateMetadata({
   params,
@@ -35,6 +42,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
   const bg = GetBackgroundImage(game);
   const first_release_date = new Date(game.first_release_date * 1000);
   const developer_name = await GetDeveloperName(game);
+  const session = await getSession();
 
   return (
     <main className="flex min-h-screen flex-col max-w-screen-xl m-auto items-center gap-8">
@@ -46,7 +54,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
         {bg && <Backdrop bg={bg} name={game.name} />}
       </section>
       {/** Content */}
-      <div className="md:flex md:flex-row max-w-3xl -mt-48 mx-auto place-items-start gap-8 h-fit p-4 lg:p-0 lg:pb-4 pb-4 z-10">
+      <div className="md:flex md:flex-row max-w-3xl lg:max-w-screen-lg -mt-48 mx-auto place-items-start gap-8 h-fit p-4 lg:p-0 lg:pb-4 pb-4 z-10">
         {/** Boxart LEFT SIDE */}
         <figure className="hidden md:flex flex-col basis-1/4 flex-shrink-0 h-fit md:sticky md:top-4">
           <BoxArt game={game} />
@@ -115,15 +123,49 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
             </div>
             {/** Right Side Column */}
             <aside className="basis-1/3">
-              <section id="Review Buttons">
-                <h4 className="flex w-full bg-secondary rounded-t-sm-md justify-center outline outline-0.5 outline-primary p-2">
-                  {" "}
-                  Sign in to log, rate or review{" "}
-                </h4>
-                <h4 className="flex w-full bg-secondary rounded-b-sm-md justify-center outline outline-0.5 outline-primary p-2">
-                  Share
-                </h4>
-              </section>
+              {!session && (
+                <section id="Logged out Review Buttons">
+                  <h4 className="flex w-full bg-secondary rounded-t-sm-md justify-center outline outline-0.5 outline-primary p-2">
+                    {" "}
+                    Sign in to log, rate or review{" "}
+                  </h4>
+                  <h4 className="flex w-full bg-secondary rounded-b-sm-md justify-center outline outline-0.5 outline-primary p-2">
+                    Share
+                  </h4>
+                </section>
+              )}
+              {session && (
+                <section
+                  id="Review/Interaction Table"
+                  className="flex flex-col bg-secondary rounded-sm-md place-content-center w-full divide-y-1 divide-primary"
+                >
+                  <div className="grid grid-cols-3 w-full p-2">
+                    <div className="flex flex-col place-items-center">
+                      <FaEye /> {"Play"}
+                    </div>
+                    <div className="flex flex-col place-items-center">
+                      <FaHeart /> {"Like"}
+                    </div>{" "}
+                    <div className="flex flex-col place-items-center">
+                      <FaRegCalendarPlus />
+                      {"Backlog"}
+                    </div>
+                  </div>
+                  <div className="place-items-center place-content-center w-full text-center p-2">
+                    {"Rate"}
+                    <div className="flex flex-row gap-1 w-full place-content-center">
+                      {" "}
+                      <FaStar /> <FaStar /> <FaStar /> <FaStar /> <FaStar />{" "}
+                    </div>
+                  </div>
+                  <div className="place-items-center place-content-center w-full text-center p-2">
+                    {"Review"}
+                  </div>
+                  <div className="place-items-center place-content-center w-full text-center p-2">
+                    {"Add to List"}
+                  </div>
+                </section>
+              )}
               <section
                 id="Quick Ratings"
                 className="flex w-full flex-row border-b border-secondary justify place-content-between uppercase items-baseline pt-4"

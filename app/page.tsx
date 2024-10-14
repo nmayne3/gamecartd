@@ -61,7 +61,7 @@ export default async function Home() {
         {session && (
           <div className="items-center text-center">
             <h1> Welcome {session.user?.name}, </h1>
-            <h2> Here's what we've been playing. </h2>
+            <h2> {`Here's what we've been playing.`} </h2>
           </div>
         )}
 

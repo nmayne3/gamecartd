@@ -53,7 +53,7 @@ model Account {
   oauth_token_secret String?
   oauth_token        String?
 
-  user User @relation(fields:[userId], references:[id], onDelete: Cascade)
+  user               User @relation(fields:[userId], references:[id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -84,4 +84,35 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Game {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String
+  user_rating   Float?
+  user_reviews  Review[]?
+  cover         String?
+
+}
+
+model Review {
+  id            String    @id @default(cuid())
+  game          String   
+  user          String
+  rating        Float
+  content       String
+  timestamp     DateTime
+}
+
+model List {
+  id            String    @id @default(cuid())
+  name          String
+  user          String
+  description   String
+  timestamp     DateTime
+  updatedAt     DateTime?
+  likedBy       String[]?
+  games         Game[]
+
 }
