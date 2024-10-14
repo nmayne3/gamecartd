@@ -91,7 +91,7 @@ model Game {
   name          String
   slug          String
   user_rating   Float?
-  user_reviews  Review[]?
+  user_reviews  Review[]
   cover         String?
 
 }
@@ -112,7 +112,7 @@ model List {
   description   String
   timestamp     DateTime
   updatedAt     DateTime?
-  likedBy       String[]?
+  likedBy       String[]
   games         Game[]
 
 }
