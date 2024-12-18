@@ -3,7 +3,7 @@
 import Button from "@/components/button";
 import Image from "next/image";
 import HeroImage from "@/assets/ltp.jpg";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 const Login = () => {
   return (
@@ -34,11 +34,19 @@ const Login = () => {
             </div>
           </div>
           <Button className={""}> Login </Button>
-          <Button onClick={() => signIn("github", { callbackUrl: "/" })}>
+          <Button
+            onClick={() => {
+              signIn("github", { callbackUrl: "/" });
+            }}
+          >
             {" "}
             Sign-In with Github{" "}
           </Button>
-          <Button onClick={() => signIn("discord", { callbackUrl: "/" })}>
+          <Button
+            onClick={async () => {
+              await signIn("discord", { callbackUrl: "/" });
+            }}
+          >
             {" "}
             Sign-In with Discord{" "}
           </Button>

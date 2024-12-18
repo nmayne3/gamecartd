@@ -69,14 +69,20 @@ model Session {
 model User {
   id            String    @id @default(cuid())
   name          String?
-  email         String?   @unique
+  slug          String    @unique
+  email         String    @unique
   emailVerified DateTime?
   image         String?
   posts         Post[]
   accounts      Account[]
   sessions      Session[]
-  Review        Review[]
-  List          List[]
+  reviews       Review[]
+  likedPosts    Review[]  @relation("LikedPosts")
+  lists         List[]
+  games         Game[]
+  likedGames    Game[]    @relation("LikedGames")
+  backlog       Game[]    @relation("BackloggedGames")
+  ratings       Rating[]
 }
 
 model VerificationToken {
@@ -88,37 +94,159 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Game {
-  id           String   @id @default(cuid())
-  name         String
-  slug         String
-  user_rating  Float?
-  user_reviews Review[]
-  cover        String?
-
-  appearsIn List[]
+model Company {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  games       Game[]    @relation("Developed")
+  country     Int?
+  logo        String?
+  slug        String    @unique
+  founded     DateTime?
+  timestamp   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  published   Game[]    @relation("Published")
+  supported   Game[]    @relation("Supported")
 }
 
+// TODO: Add themes and genres to game model
+model Game {
+  id                 String        @id @default(cuid())
+  name               String
+  slug               String        @unique
+  user_reviews       Review[]
+  cover              String?
+  first_release_date DateTime?
+  developers         Company[]     @relation("Developed")
+  publishers         Company[]     @relation("Published")
+  supporting_devs    Company[]     @relation("Supported")
+  genres             Genre[]
+  tags               String[]
+  artworks           Artwork[]
+  screenshots        Screenshots[]
+  listItems          ListItem[]
+  users              User[]
+  likedBy            User[]        @relation("LikedGames")
+  backloggedBy       User[]        @relation("BackloggedGames")
+  summary            String?
+  platforms          Platform[]
+  user_ratings       Rating[]
+}
+
+model Artwork {
+  id            String  @id @default(cuid())
+  alpha_channel Boolean @default(false)
+  animated      Boolean @default(false)
+  height        Int // height of the image in pixels
+  image_id      String  @unique // The ID of the image used to construct@unique an IGDB image link
+  url           String // The website address (URL) of the item    
+  width         Int // The width of the image in pixels
+  game          Game    @relation(fields: [gameId], references: [id])
+  gameId        String
+}
+
+model Screenshots {
+  id            String  @id @default(cuid())
+  alpha_channel Boolean @default(false)
+  animated      Boolean @default(false)
+  height        Int // height of the image in pixels
+  image_id      String  @unique // The ID of the image used to construct@unique an IGDB image link
+  url           String // The website address (URL) of the item    
+  width         Int // The width of the image in pixels
+  gameId        String
+  game          Game    @relation(fields: [gameId], references: [id])
+}
+
+model Genre {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  games     Game[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+// This is really more of a journal than a review
 model Review {
   id        String   @id @default(cuid())
-  game      String
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  String?
-  rating    Float
-  content   String
-  timestamp DateTime
-  Game      Game?    @relation(fields: [gameId], references: [id])
-  gameId    String?
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  content   String? // Users's review/thoughts on a game
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String
+  replay    Boolean  @default(false) // Is this a replay of a game?
+  completed Boolean  @default(false) // Did user complete the game?
+  likedBy   User[]   @relation("LikedPosts") //Users that liked the post
+}
+
+model Rating {
+  user   User   @relation(fields: [userId], references: [id])
+  game   Game   @relation(fields: [gameId], references: [id])
+  rating Float
+  userId String
+  gameId String
+
+  @@id([userId, gameId])
 }
 
 model List {
-  id          String    @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
-  author      User?     @relation(fields: [authorId], references: [id])
+  author      User?      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String?
   description String
-  timestamp   DateTime
-  updatedAt   DateTime?
+  timestamp   DateTime   @default(now())
+  updatedAt   DateTime?  @updatedAt
+  tags        String[]
   likedBy     String[]
-  games       Game[]
+  games       ListItem[]
+  ranked      Boolean    @default(false)
+}
+
+model ListItem {
+  id          String   @id @default(cuid())
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId      String
+  description String?
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId      String
+  createdAt   DateTime @default(now())
+}
+
+model Platform {
+  id               String          @id @default(cuid()) // Hash of the object
+  abbreviation     String? // An abbreviation of the platform name
+  alternative_name String? // 	An alternative name for the platform
+  created_at       DateTime        @default(now()) // Date this was initially added to the IGDB database
+  generation       Int? // The generation of the platform
+  name             String // The name of the platform
+  platformLogo     PlatformLogo?   @relation(fields: [platformLogoId], references: [id]) //	Reference ID for Platform Logo //	The logo of the first Version of this platform
+  platformLogoId   String?         @unique
+  platformFamily   PlatformFamily? @relation(fields: [platformFamilyId], references: [id]) //	Reference ID for Platform Family //	The family of platforms this one belongs to
+  platformFamilyId String?
+  slug             String          @unique //	A url-safe, unique, lower-case version of the name
+  summary          String? //	The summary of the first Version of this platform
+  updated_at       DateTime        @updatedAt //	The last date this entry was updated in the IGDB database
+  url              String? //	The website address (URL) of the item
+  games            Game[]
+}
+
+model PlatformLogo {
+  id            String    @id @default(cuid())
+  alpha_channel Boolean   @default(false)
+  animated      Boolean   @default(false)
+  height        Int // height of the image in pixels
+  image_id      String    @unique // The ID of the image used to construct@unique an IGDB image link
+  url           String // The website address (URL) of the item    
+  width         Int // The width of the image in pixels
+  platform      Platform?
+}
+
+model PlatformFamily {
+  id        String     @id @default(cuid()) // Hash of the object
+  name      String //	The name of the platform family
+  slug      String     @unique //	A url-safe, unique, lower-case version of the name
+  platforms Platform[]
 }

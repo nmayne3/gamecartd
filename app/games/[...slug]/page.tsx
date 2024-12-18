@@ -9,7 +9,13 @@ class QueryParam {
 
 function slugToAPI(param: QueryParam) {
   switch (param.field) {
+    case "decade":
+      return;
     case "genres":
+      return;
+    case "by":
+      return;
+    case "this":
       return;
   }
 }
@@ -17,8 +23,10 @@ function slugToAPI(param: QueryParam) {
 const GamesFunPage = async ({ params }: { params: { slug: string[] } }) => {
   const slugs = params.slug;
   const Params = [];
+  console.log();
+  const start = slugs[0] == "popular" ? 1 : 0;
 
-  for (let i = 0; i < slugs.length; i++) {
+  for (let i = start; i < slugs.length; i++) {
     // odds
     if (i % 2) {
       Params[Math.floor(i / 2)].value = slugs[i];

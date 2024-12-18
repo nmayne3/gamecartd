@@ -7,6 +7,7 @@ import Footer from "@/components/footer";
 import { SessionProvider } from "next-auth/react";
 import Providers from "./providers";
 import { getSession } from "./api/auth/[...nextauth]/auth";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 const dm_serif_display = DM_Serif_Display({
@@ -34,7 +35,7 @@ export default async function RootLayout({
             <Navbar />
           </div>
           {await children}
-
+          <Toaster />
           <Footer />
         </Providers>
       </body>

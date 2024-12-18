@@ -1,6 +1,6 @@
 "use client";
 
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { Game } from "@/igdb/interfaces";
 import { useState } from "react";
 
@@ -20,13 +20,13 @@ const BoxArt = ({
   size = size ? size : "big_2x";
   const [loaded, setLoaded] = useState(false);
   return (
-    <div className="group relative rounded-sm-md shadow-xl smooth-transition  outline outline-0.5 outline-secondary h-full w-full hover:-outline-offset-2 hover:outline-2 hover:outline-accent-green">
+    <div className="group relative rounded-sm-md shadow-xl smooth-transition  outline outline-0.5 outline-secondary h-full w-full hover:-outline-offset-2 hover:outline-2 hover:outline-accent-green max-h-fit">
       {game.cover && (
         <Image
           src={`https://images.igdb.com/igdb/image/upload/t_cover_${size}/${game.cover.image_id}.jpg`}
           width={width ? width : game.cover.width}
           height={height ? height : game.cover.height}
-          alt="Movie Poster"
+          alt="Box Art"
           className="peer rounded-sm-md h-full w-full object-cover"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
           onLoad={(e) => setLoaded(true)}

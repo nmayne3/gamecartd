@@ -56,25 +56,27 @@ const BrowsePage = async ({
   return (
     <main className="w-full">
       <header id="Header Filler Block" className="w-full h-12 bg-primary" />
-      <section className="max-w-screen-lg h-full w-full flex flex-col justify-self-center mx-auto divide-y divide-secondary py-8">
-        {/** Header with Filter Menu */}
-        <SectionHeader title="Games">
-          {" "}
-          <BrowseMenu />{" "}
-        </SectionHeader>
-        {/** Table of Games */}
-        <div className="grid grid-cols-12 grid-flow-row gap-2 place-items-center py-2 ">
-          {games.map((game) => (
-            <div key={game.slug} className="h-full w-full ">
-              <Link key={game.slug} href={`/game/${game.slug}`}>
-                <BoxArt game={game} size="small"></BoxArt>
-              </Link>
-            </div>
-          ))}
-        </div>
-        {/** Next / Previous Page Buttons */}
-        <PageButtons />
-      </section>
+      <div className="bg-[url('https://s.ltrbxd.com/static/img/content-bg.4284ab72.png')] bg-repeat-x w-full h-full">
+        <section className=" max-w-screen-lg h-full w-full flex flex-col justify-self-center mx-auto divide-y divide-secondary py-8">
+          {/** Header with Filter Menu */}
+          <SectionHeader title="Games">
+            {" "}
+            <BrowseMenu />{" "}
+          </SectionHeader>
+          {/** Table of Games */}
+          <div className="grid grid-cols-12 grid-flow-row gap-2 place-items-center py-2 ">
+            {games.map((game) => (
+              <div key={game.slug} className="h-full w-full ">
+                <Link key={game.slug} href={`/game/${game.slug}`}>
+                  <BoxArt game={game} size="small"></BoxArt>
+                </Link>
+              </div>
+            ))}
+          </div>
+          {/** Next / Previous Page Buttons */}
+          <PageButtons />
+        </section>
+      </div>
     </main>
   );
 };

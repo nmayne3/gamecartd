@@ -2,7 +2,16 @@
 
 import React from "react";
 import { Tabs, Tab } from "@nextui-org/tabs";
-import { Game, Descriptor, Localizations, Company } from "@/igdb/interfaces";
+import {
+  Game,
+  Descriptor,
+  Localizations,
+  Company,
+  InvolvedCompany,
+  Platform,
+} from "@/igdb/interfaces";
+
+// TODO: Change from Game interface to prisma Game
 
 export const InfoTabs = ({ game }: { game: Game }) => {
   return (
@@ -72,7 +81,7 @@ const DetailList = ({
   descriptors,
 }: {
   sectionTitle: string;
-  descriptors: Array<Descriptor>;
+  descriptors: Array<Descriptor> | Array<Platform>;
 }) => {
   if (!descriptors || descriptors.length < 1) return;
   return (
@@ -88,10 +97,10 @@ const DetailList = ({
       <div className="basis-3/5 flex flex-row gap-1 flex-wrap capitalize">
         {" "}
         {descriptors.map(
-          (descriptor: Descriptor) =>
+          (descriptor) =>
             descriptor && (
               <div
-                key={descriptor.id}
+                key={descriptor.id ? descriptor.id : descriptor.name}
                 className="bg-secondary/75 rounded-sm-md pt-[0.06rem] shadow-inner whitespace-nowrap overflow-hidden hover:brightness-125"
               >
                 <div className="p-1 bg-dark-grey rounded-sm-md">
@@ -106,7 +115,7 @@ const DetailList = ({
   );
 };
 
-const CompaniesTab = ({ companies }: { companies: Array<Company> }) => {
+const CompaniesTab = ({ companies }: { companies: Array<InvolvedCompany> }) => {
   const developers = [];
   const publishers = [];
   const porters = [];

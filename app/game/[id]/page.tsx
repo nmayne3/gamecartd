@@ -1,12 +1,17 @@
 import Image from "next/image";
 import "@/app/styles/home.css";
-import BoxArt from "@/components/boxart";
+import BoxArt from "@/components/boxartalt";
 import { Game, Picture, Descriptor, Company } from "@/igdb/interfaces";
 import { getAccessToken } from "@/igdb/auth";
 import { InfoTabs } from "@/components/infotabs";
 import { Section } from "@/components/section";
 import { ReviewCard } from "@/components/reviewcard";
 import RowGames from "@/components/rowgames";
+import PlayedButton, {
+  BacklogButton,
+  LikeButton,
+} from "@/components/playedbutton";
+import { CheckPlayed } from "@/app/api/games/actions";
 import {
   FaEye,
   FaHeart,
@@ -17,6 +22,13 @@ import {
 import Backdrop from "@/components/backdrop";
 import type { Metadata } from "next";
 import { getSession } from "@/app/api/auth/[...nextauth]/auth";
+import prisma from "@/lib/prisma";
+import { Suspense } from "react";
+import { SpinnerIcon } from "@/components/icons";
+import ReviewWindow from "@/components/reviewwindow";
+import { ReviewCardGamePage } from "@/components/reviewcardalt";
+import { AddGame } from "@/app/api/games/actions";
+import { StarRating } from "@/components/reviewwindow";
 
 export async function generateMetadata({
   params,
@@ -24,25 +36,50 @@ export async function generateMetadata({
   params: { id: string };
 }): Promise<Metadata> {
   // read route params
+
   const id = params.id;
-  const game = await GetGame(id);
-  const bg = GetBackgroundImage(game);
+  const game = await GetGame3P(id);
   const first_release_date = new Date(game.first_release_date * 1000);
-  const developer_name = await GetDeveloperName(game);
 
   return {
-    title: `${game.name} (${first_release_date.getFullYear()})`,
+    title: `${game.name} (${first_release_date?.getFullYear()})`,
   };
+  // Query returns User or null
 }
 
 const GamePage = async ({ params }: { params: { id: string } }) => {
   const id = params.id;
   console.log(id);
   const game = await GetGame(id);
-  const bg = GetBackgroundImage(game);
-  const first_release_date = new Date(game.first_release_date * 1000);
-  const developer_name = await GetDeveloperName(game);
+  const bg = await GetBackgroundImage(game);
+  const first_release_date = game.first_release_date;
+  const developer_name = game.developers.length
+    ? game.developers[0].name
+    : null;
   const session = await getSession();
+  const [played, liked, backlogged] = session?.user.id
+    ? await CheckPlayed(id, session?.user.id)
+    : [false];
+
+  const game3p = await GetGame3P(id);
+  const reviews = game.user_reviews;
+
+  const rating = session?.user.id
+    ? await prisma.rating.findUnique({
+        where: { userId_gameId: { userId: session?.user.id, gameId: game.id } },
+      })
+    : null;
+
+  // Sorts reviews by date
+  reviews.sort((a, b) => {
+    if (a.createdAt < b.createdAt) {
+      return 1;
+    } else if (a.createdAt > b.createdAt) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
 
   return (
     <main className="flex min-h-screen flex-col max-w-screen-xl m-auto items-center gap-8">
@@ -86,16 +123,18 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
               <h2 className="flex flex-col-reverse md:flex-row gap-1 text-sm flex-shrink-0 xl:text-lg">
                 {/** Release Date */}
                 <time id="Release Year" className="text-white">
-                  {first_release_date.getFullYear()}
+                  {first_release_date && first_release_date.getFullYear()}
                 </time>
 
                 {/** Developer Name */}
-                <div className="flex flex-col md:flex-row md:gap-1">
-                  Developed by{" "}
-                  <div id="Developer Name" className="text-white">
-                    {developer_name}{" "}
+                {developer_name && (
+                  <div className="flex flex-col md:flex-row md:gap-1">
+                    Developed by{" "}
+                    <div id="Developer Name" className="text-white">
+                      {developer_name}{" "}
+                    </div>
                   </div>
-                </div>
+                )}
               </h2>
             </header>
             <figure className="md:hidden basis-1/4">
@@ -109,17 +148,17 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
               <section id="Description">
                 <div className="uppercase flex flex-row gap-2 flex-wrap pb-2">
                   {/** Do keywords as a tagline / Header? */}
-                  {game.keywords &&
-                    game.keywords.slice(0, 3).map((keyword) => (
-                      <h3 key={keyword.id} className="uppercase">
+                  {game.tags &&
+                    game.tags.slice(0, 3).map((keyword) => (
+                      <h3 key={keyword} className="uppercase">
                         {" "}
-                        {keyword.name}.{" "}
+                        {keyword}.{" "}
                       </h3>
                     ))}
                 </div>
                 {game.summary && <p className=""> {game.summary} </p>}
               </section>
-              <InfoTabs game={game} />
+              <InfoTabs game={game3p} />
             </div>
             {/** Right Side Column */}
             <aside className="basis-1/3">
@@ -137,29 +176,34 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
               {session && (
                 <section
                   id="Review/Interaction Table"
-                  className="flex flex-col bg-secondary rounded-sm-md place-content-center w-full divide-y-1 divide-primary"
+                  className="flex flex-col bg-secondary rounded-sm place-content-center w-full divide-y-1 divide-primary text-sm"
                 >
                   <div className="grid grid-cols-3 w-full p-2">
-                    <div className="flex flex-col place-items-center">
-                      <FaEye /> {"Play"}
-                    </div>
-                    <div className="flex flex-col place-items-center">
-                      <FaHeart /> {"Like"}
-                    </div>{" "}
-                    <div className="flex flex-col place-items-center">
-                      <FaRegCalendarPlus />
-                      {"Backlog"}
-                    </div>
+                    <PlayedButton
+                      game={game}
+                      initialState={played ? true : false}
+                    />
+
+                    <LikeButton game={game} initialState={liked} />
+                    <BacklogButton game={game} initialState={backlogged} />
                   </div>
                   <div className="place-items-center place-content-center w-full text-center p-2">
                     {"Rate"}
                     <div className="flex flex-row gap-1 w-full place-content-center">
                       {" "}
-                      <FaStar /> <FaStar /> <FaStar /> <FaStar /> <FaStar />{" "}
+                      <StarRating
+                        game={game}
+                        initialState={rating ? true : false}
+                        initialRating={rating ? rating.rating : 0}
+                      />{" "}
                     </div>
                   </div>
                   <div className="place-items-center place-content-center w-full text-center p-2">
-                    {"Review"}
+                    <ReviewWindow
+                      game={game}
+                      rating={rating?.rating || 0}
+                      isRated={rating ? true : false}
+                    ></ReviewWindow>
                   </div>
                   <div className="place-items-center place-content-center w-full text-center p-2">
                     {"Add to List"}
@@ -175,18 +219,40 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
               </section>
             </aside>
           </div>
-          <Section header="Popular Reviews">
-            <ReviewCard />
-            <ReviewCard />
-            <ReviewCard />
-          </Section>
-          <Section header="Recent Reviews">
-            <ReviewCard />
-            <ReviewCard />
-            <ReviewCard />
-          </Section>
+          {/** Review Section */}
+          {reviews.length > 0 && (
+            <Section header="Popular Reviews">
+              {reviews
+                .toSorted((a, b) => {
+                  if (a._count.likedBy < b._count.likedBy) {
+                    return 1;
+                  } else if (a._count.likedBy > b._count.likedBy) {
+                    return -1;
+                  } else {
+                    return 0;
+                  }
+                })
+                .slice(0, 2)
+                .map((review) => (
+                  <ReviewCardGamePage key={review.id} review={review} />
+                ))}
+            </Section>
+          )}
+          {reviews.length > 0 && (
+            <Section header="Recent Reviews">
+              {reviews.slice(0, 3).map((review) => {
+                return (
+                  <ReviewCardGamePage
+                    key={review.id}
+                    review={review}
+                  ></ReviewCardGamePage>
+                );
+              })}
+            </Section>
+          )}
+
           <Section header="Similar Games">
-            <RowGames games={game.similar_games} limit={5}></RowGames>
+            <RowGames games={game3p.similar_games} limit={5}></RowGames>
           </Section>
         </div>
       </div>
@@ -196,7 +262,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
 
 export default GamePage;
 
-const GetGame = async (id: string): Promise<Game> => {
+const GetGame3P = async (id: string): Promise<Game> => {
   const access_token = getAccessToken();
 
   if (
@@ -216,7 +282,7 @@ const GetGame = async (id: string): Promise<Game> => {
       "Client-ID": process.env.client_id,
       Authorization: "Bearer " + access_token,
     },
-    body: `fields *, similar_games.cover.*, similar_games.name, similar_games.slug, platforms.name, game_localizations.name, game_localizations.region.name, alternative_names.name, game_modes.name, keywords.name, themes.name, cover.*, artworks.*, screenshots.*, genres.*, involved_companies.*, involved_companies.company.name; where slug = "${id}"; limit 1;`,
+    body: `fields *, similar_games.cover.*, similar_games.name, similar_games.slug, platforms.*, platforms.platform_logo.*, platforms.platform_family.*, game_localizations.name, game_localizations.region.name, alternative_names.name, game_modes.name, keywords.name, themes.name, cover.*, artworks.*, screenshots.*, genres.*, involved_companies.*, involved_companies.company.*, involved_companies.company.logo.*; where slug = "${id}"; limit 1;`,
   });
   const clone = await response.clone().json();
   console.log(response.status);
@@ -231,24 +297,44 @@ const GetGame = async (id: string): Promise<Game> => {
   return await game[0];
 };
 
-const GetDeveloperName = async (game: Game) => {
-  let name = "";
-  if (!game.involved_companies) {
-    return "Unknown";
+const GetBackgroundImage = async (game: {
+  id: string;
+  name: string;
+  slug: string;
+  cover: string | null;
+  first_release_date: Date | null;
+  tags: string[];
+}): Promise<Picture | null> => {
+  const result = await prisma.game.findUniqueOrThrow({
+    where: { id: game.id },
+    select: { artworks: true, screenshots: true, cover: true },
+  });
+
+  if (result.screenshots.length) {
+    return result.screenshots[0];
+  } else if (result.artworks.length) {
+    return result.artworks[0];
   }
-  for (const company of game.involved_companies) {
-    if (company.developer == true) {
-      name = company.company.name;
-    }
-  }
-  return name;
+  if (result.cover)
+    return { image_id: result.cover, height: 1080, width: 1920 };
+  return null;
 };
 
-const GetBackgroundImage = (game: Game): Picture => {
-  if (game.artworks) {
-    return game.artworks[0];
-  } else if (game.screenshots) {
-    return game.screenshots[0];
+const GetGame = async (id: string) => {
+  const getGame = await prisma.game.findUnique({
+    where: {
+      slug: id,
+    },
+    include: {
+      developers: true,
+      user_ratings: true,
+      user_reviews: { include: { _count: { select: { likedBy: true } } } },
+    },
+  });
+  if (!getGame) {
+    const game = await GetGame3P(id);
+    const newGame = await AddGame(game);
+    return newGame;
   }
-  return game.cover;
+  return getGame;
 };

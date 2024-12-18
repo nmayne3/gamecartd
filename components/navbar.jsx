@@ -52,6 +52,13 @@ const Navbar = () => {
                 name={session.data.user?.name}
                 icon_src={session.data.user?.image}
               >
+                <Link
+                  href={`/user/${session?.data.user.slug}`}
+                  className="uppercase w-full text-left"
+                >
+                  {" "}
+                  Profile{" "}
+                </Link>
                 <button
                   className="uppercase w-full text-left"
                   onClick={() => signOut()}

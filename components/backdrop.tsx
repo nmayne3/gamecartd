@@ -18,7 +18,7 @@ const Backdrop = ({ bg, name }: { bg: Picture; name: string }) => {
       alt={name}
       className="z-0 object-cover aspect-video w-[1200px]"
       ref={ref}
-      onLoadingComplete={() => setLoaded((loaded) => true)}
+      onLoad={() => setLoaded((loaded) => true)}
       style={{
         opacity: loaded ? 1 : 0,
         transition: "opacity 0.2s cubic-bezier(0.3, 0.2, 0.2, 0.8)",

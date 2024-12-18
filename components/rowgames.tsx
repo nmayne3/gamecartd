@@ -4,7 +4,10 @@ import { Game } from "@/igdb/interfaces";
 
 const RowGames = ({ games, limit }: { games: Array<Game>; limit?: number }) => {
   if (!games) return;
-  const size = games.length < 7 ? "big" : "small";
+  if (!limit) {
+    limit = games.length;
+  }
+  const size = limit < 7 ? "big" : "small";
   return (
     <div className="flex flex-row h-auto place-items-center justify-between gap-2 py-2">
       {games.slice(0, limit).map((game) => (

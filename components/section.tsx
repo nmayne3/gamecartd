@@ -1,11 +1,17 @@
+import Link from "next/link";
+
 export const Section = ({
   header,
   children,
   className,
+  href,
+  more,
 }: {
   header: string;
   children?: React.ReactNode;
   className?: string;
+  href?: string;
+  more?: string;
 }) => {
   return (
     <section className={`w-full h-fit ${className}`}>
@@ -14,13 +20,22 @@ export const Section = ({
         id="Section Heading"
         className="w-full border-b border-secondary uppercase py-0.5 flex flex-row justify-between text-xs"
       >
-        <h4 className="hover:text-blue-400"> {header} </h4>
-        <h4 className="hover:text-blue-400"> More </h4>
+        {href && (
+          <Link href={href}>
+            <h4 className="hover:text-blue-400"> {header} </h4>
+          </Link>
+        )}
+        {!href && <h4 className="hover:text-blue-400"> {header} </h4>}
+        {href && (
+          <Link href={href}>
+            <h4 className="hover:text-blue-400"> {more ? more : "More"} </h4>
+          </Link>
+        )}
       </div>
       {/** Content Section */}
       <div
         id="Section Content"
-        className="w-full max-h divide-y-1 divide-dark-grey"
+        className="w-full h-full divide-y-1 divide-dark-grey"
       >
         {children}
       </div>
