@@ -61,7 +61,10 @@ export const AddToListWindow = ({
             <div className="">{`+ New List...`}</div>
             <section id="created lists">
               {lists.map((list) => (
-                <div className="w-full flex flex-row place-content-between">
+                <div
+                  key={list.name}
+                  className="w-full flex flex-row place-content-between"
+                >
                   {list.name}
                   {`# games`}
                 </div>
