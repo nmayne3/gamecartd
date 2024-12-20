@@ -55,6 +55,7 @@ const PlayedButton = ({
     <button
       className="flex flex-col place-items-center group"
       onClick={async () => await handleChange()}
+      disabled={user_id ? false : true}
     >
       {optimsticPlayed ? (
         <IoEye
@@ -110,10 +111,12 @@ export const LikeButton = ({
     setLiked(!liked);
     setIsFetching(false);
   };
+  const user = useSession().data?.user;
   return (
     <button
       className="flex flex-col place-items-center group"
       onClick={async () => await handleChange()}
+      disabled={user ? false : true}
     >
       {optimsticLiked && (
         <FaHeart className={`fill-accent-orange m-2`} style={{ scale: 1.8 }} />
@@ -156,10 +159,12 @@ export const BacklogButton = ({
     setBacklogged(!backlogged);
     setIsFetching(false);
   };
+  const user_id = useSession().data?.user.id;
   return (
     <button
       className="flex flex-col place-items-center group"
       onClick={handleChange}
+      disabled={user_id ? false : true}
     >
       <div className="">
         {optimsticBacklogged && (

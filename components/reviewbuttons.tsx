@@ -5,6 +5,7 @@ import { Review } from "@prisma/client";
 import { useState, useOptimistic } from "react";
 import { FaHeart } from "react-icons/fa6";
 import { SpinnerIcon } from "./icons";
+import { useSession } from "next-auth/react";
 
 export const LikeButton = ({
   review,
@@ -35,11 +36,13 @@ export const LikeButton = ({
     setLiked(!liked);
   };
 
+  const session = useSession();
   return (
     <div className="flex flex-row gap-2">
       <button
         className="flex flex-row place-items-center group gap-1"
         onClick={handleChange}
+        disabled={session.data?.user ? false : true}
       >
         <div>
           <FaHeart

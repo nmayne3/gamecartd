@@ -26,9 +26,9 @@ export const ReviewCardGamePage = async ({ review }: { review: Review }) => {
 
   const constructedSelect = session?.user?.email
     ? { likedBy: { where: { email: session?.user?.email } } }
-    : {};
+    : { likedBy: true };
 
-  const likedReviews = await prisma.review.findUniqueOrThrow({
+  const likedReviews = await prisma.review.findUnique({
     where: { id: review.id },
     select: {
       _count: {
@@ -40,10 +40,12 @@ export const ReviewCardGamePage = async ({ review }: { review: Review }) => {
 
   // User is signed in
   const initialLikedState = session?.user?.email
-    ? likedReviews._count.likedBy > 0
+    ? likedReviews
+      ? likedReviews._count.likedBy > 0
+      : false
     : false;
 
-  const initialLikeCount = likedReviews.likedBy.length;
+  const initialLikeCount = likedReviews?.likedBy.length;
 
   const likedGame = game._count.likedBy > 0;
 
@@ -92,7 +94,7 @@ export const ReviewCardGamePage = async ({ review }: { review: Review }) => {
         <LikeButton
           review={review}
           initialState={initialLikedState}
-          initialCount={initialLikeCount}
+          initialCount={initialLikeCount || 0}
         />
       </div>
     </section>
@@ -116,7 +118,7 @@ export const ReviewCardUserPage = async ({
   // User is signed in
   const constructedSelect = session?.user?.email
     ? { likedBy: { where: { email: session?.user?.email } } }
-    : {};
+    : { likedBy: true };
 
   const likedReviews = await prisma.review.findUniqueOrThrow({
     where: { id: review.id },
