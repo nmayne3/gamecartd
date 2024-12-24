@@ -72,6 +72,13 @@ const AddGame = ({
             className="rounded-l-none h-full"
           />
         </div>
+        <button
+          type="submit"
+          className="my-4 bg-accent-green border-t border-t-white/40 text-white py-1 px-3 rounded-sm text-sm font-semibold uppercase"
+        >
+          {" "}
+          Save{" "}
+        </button>
       </div>
 
       <ul className="border rounded-md border-border divide-y">
