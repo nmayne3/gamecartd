@@ -1,17 +1,15 @@
-import Image from "next/image";
 import "@/app/styles/home.css";
 import BoxArt from "@/components/boxartalt";
 import { Game, Picture, Descriptor, Company } from "@/igdb/interfaces";
 import { getAccessToken } from "@/igdb/auth";
 import { InfoTabs } from "@/components/infotabs";
 import { Section } from "@/components/section";
-import { ReviewCard } from "@/components/reviewcard";
 import RowGames from "@/components/rowgames";
 import PlayedButton, {
   BacklogButton,
   LikeButton,
 } from "@/components/playedbutton";
-import { CheckPlayed } from "@/app/api/games/actions";
+import { CheckPlayed, GetGameCombo } from "@/app/api/games/actions";
 import {
   FaEye,
   FaHeart,
@@ -23,12 +21,13 @@ import Backdrop from "@/components/backdrop";
 import type { Metadata } from "next";
 import { getSession } from "@/app/api/auth/[...nextauth]/auth";
 import prisma from "@/lib/prisma";
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 import { SpinnerIcon } from "@/components/icons";
 import ReviewWindow from "@/components/reviewwindow";
 import { ReviewCardGamePage } from "@/components/reviewcardalt";
 import { AddGame } from "@/app/api/games/actions";
 import { StarRating } from "@/components/reviewwindow";
+import { Artwork, Screenshots } from "@prisma/client";
 
 export async function generateMetadata({
   params,
@@ -38,8 +37,8 @@ export async function generateMetadata({
   // read route params
 
   const id = params.id;
-  const game = await GetGame3P(id);
-  const first_release_date = new Date(game.first_release_date * 1000);
+  const game = await GetGameCombo(id);
+  const first_release_date = game.first_release_date;
 
   return {
     title: `${game.name} (${first_release_date?.getFullYear()})`,
@@ -262,7 +261,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
 
 export default GamePage;
 
-const GetGame3P = async (id: string): Promise<Game> => {
+const GetGame3P = cache(async (id: string): Promise<Game> => {
   const access_token = getAccessToken();
 
   if (
@@ -284,7 +283,6 @@ const GetGame3P = async (id: string): Promise<Game> => {
     },
     body: `fields *, similar_games.cover.*, similar_games.name, similar_games.slug, platforms.*, platforms.platform_logo.*, platforms.platform_family.*, game_localizations.name, game_localizations.region.name, alternative_names.name, game_modes.name, keywords.name, themes.name, cover.*, artworks.*, screenshots.*, genres.*, involved_companies.*, involved_companies.company.*, involved_companies.company.logo.*; where slug = "${id}"; limit 1;`,
   });
-  const clone = await response.clone().json();
   console.log(response.status);
   // Authorization Error
   if (response.status == 401 || response.status == 400) {
@@ -295,7 +293,7 @@ const GetGame3P = async (id: string): Promise<Game> => {
   const game = await response.json();
   console.log(game);
   return await game[0];
-};
+});
 
 const GetBackgroundImage = async (game: {
   id: string;
@@ -304,23 +302,19 @@ const GetBackgroundImage = async (game: {
   cover: string | null;
   first_release_date: Date | null;
   tags: string[];
+  screenshots: Screenshots[];
+  artworks: Artwork[];
 }): Promise<Picture | null> => {
-  const result = await prisma.game.findUniqueOrThrow({
-    where: { id: game.id },
-    select: { artworks: true, screenshots: true, cover: true },
-  });
-
-  if (result.screenshots.length) {
-    return result.screenshots[0];
-  } else if (result.artworks.length) {
-    return result.artworks[0];
-  }
-  if (result.cover)
-    return { image_id: result.cover, height: 1080, width: 1920 };
+  if (game.screenshots.length) {
+    return game.screenshots[0];
+  } else if (game.artworks.length) {
+    return game.artworks[0];
+  } else if (game.cover)
+    return { image_id: game.cover, height: 1080, width: 1920 };
   return null;
 };
 
-const GetGame = async (id: string) => {
+const GetGame = cache(async (id: string) => {
   const getGame = await prisma.game.findUnique({
     where: {
       slug: id,
@@ -329,6 +323,8 @@ const GetGame = async (id: string) => {
       developers: true,
       user_ratings: true,
       user_reviews: { include: { _count: { select: { likedBy: true } } } },
+      artworks: true,
+      screenshots: true,
     },
   });
   if (!getGame) {
@@ -337,4 +333,4 @@ const GetGame = async (id: string) => {
     return newGame;
   }
   return getGame;
-};
+});

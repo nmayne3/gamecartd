@@ -415,6 +415,8 @@ export async function AddGame(game: Game) {
     },
     include: {
       developers: true,
+      screenshots: true,
+      artworks: true,
       user_reviews: { include: { _count: { select: { likedBy: true } } } },
     },
   });
