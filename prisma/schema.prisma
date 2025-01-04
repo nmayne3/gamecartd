@@ -194,6 +194,7 @@ model Rating {
 model List {
   id          String     @id @default(cuid())
   name        String
+  slug        String     @unique
   author      User?      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String?
   description String

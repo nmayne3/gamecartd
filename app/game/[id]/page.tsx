@@ -37,7 +37,7 @@ export async function generateMetadata({
   // read route params
 
   const id = params.id;
-  const game = await GetGameCombo(id);
+  const game = await GetGame(id);
   const first_release_date = game.first_release_date;
 
   return {

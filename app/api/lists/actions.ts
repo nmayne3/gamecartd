@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { getSession } from "../auth/[...nextauth]/auth";
+import { makeURLSafe } from "@/hooks/urlsafe";
 
 const addGameToList = (game_slug: string, list_id: string) => {};
 
@@ -14,6 +15,7 @@ export const createList = async (
   console.log("creating list...");
   const session = await getSession();
   const user_id = session?.user?.id ? session.user.id : "";
+  const slug = makeURLSafe(name);
 
   const constructed_games = game_ids
     ? {
@@ -27,6 +29,7 @@ export const createList = async (
   const result = await prisma.list.create({
     data: {
       name: name,
+      slug: slug,
       description: description ? description : "",
       authorId: user_id,
       games: constructed_games,
@@ -37,4 +40,3 @@ export const createList = async (
   console.log(result);
   return result;
 };
-
