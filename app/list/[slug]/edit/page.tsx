@@ -17,3 +17,5 @@ const EditList = ({ params }: { params: { slug: string } }) => {
     </main>
   );
 };
+
+export default EditList;

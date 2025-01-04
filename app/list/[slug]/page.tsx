@@ -6,3 +6,5 @@ const ListPage = ({ params }: { params: { slug: string } }) => {
     </main>
   );
 };
+
+export default ListPage;
