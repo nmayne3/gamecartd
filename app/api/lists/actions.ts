@@ -15,7 +15,17 @@ export const createList = async (
   console.log("creating list...");
   const session = await getSession();
   const user_id = session?.user?.id ? session.user.id : "";
-  const slug = makeURLSafe(name);
+  const ideal_slug = makeURLSafe(name);
+
+  // Find lists with similar slugs
+  const dupes = await prisma.list.findMany({
+    where: {
+      slug: { contains: ideal_slug },
+    },
+  });
+
+  // Append number of duplicates to keep slugs unique
+  const slug = dupes.length ? ideal_slug + "-" + dupes.length : ideal_slug;
 
   const constructed_games = game_ids
     ? {
@@ -26,6 +36,7 @@ export const createList = async (
         },
       }
     : {};
+
   const result = await prisma.list.create({
     data: {
       name: name,
