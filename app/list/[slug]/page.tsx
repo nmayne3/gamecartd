@@ -16,8 +16,11 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
   return (
     <main className="min-h-fit">
       <div id="Header Filler Block" className="w-full h-12 bg-primary" />
-      <div className="flex flex-row max-w-3xl lg:max-w-screen-lg mx-auto divide-x">
-        <div id="List Panel" className="flex flex-col gap-2">
+      <div className="flex flex-row max-w-3xl lg:max-w-screen-lg mx-auto">
+        <div
+          id="List Panel"
+          className="flex flex-col gap-2 divide-y min-h-fit h-full"
+        >
           <div id="Author Info" className="flex flex-row">
             {author && author.image && (
               <Link href={`/user/${author.slug}`} className="rounded-full">
@@ -53,9 +56,11 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
                     >
                       <BoxArt game={entry.game} size="big"></BoxArt>
                     </Link>
-                    {list.ranked && (
-                      <div className="text-center"> {index + 1} </div>
-                    )}
+                    <div>
+                      {list.ranked && (
+                        <div className="text-center h-full"> {index + 1} </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>{" "}
