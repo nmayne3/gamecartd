@@ -11,6 +11,8 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
   });
   const author = list.author;
   const games = list.games;
+  if (author == null) throw new Error("no author");
+
   return (
     <main>
       <div className="flex flex-row">
