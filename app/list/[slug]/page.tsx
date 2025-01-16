@@ -14,8 +14,9 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
   if (author == null) throw new Error("no author");
 
   return (
-    <main>
-      <div className="flex flex-row">
+    <main className="min-h-fit">
+      <div id="Header Filler Block" className="w-full h-12 bg-primary" />
+      <div className="flex flex-row max-w-3xl lg:max-w-screen-lg mx-auto divide-x">
         <div id="List Panel" className="flex flex-col gap-2">
           <div id="Author Info" className="flex flex-row">
             {author && author.image && (
