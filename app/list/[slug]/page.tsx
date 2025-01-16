@@ -16,7 +16,7 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
       <div className="flex flex-row">
         <div id="List Panel" className="flex flex-col gap-2">
           <div id="Author Info" className="flex flex-row">
-            {author.image && (
+            {author && author.image && (
               <Link href={`/user/${author.slug}`} className="rounded-full">
                 <Image
                   src={author.image}
