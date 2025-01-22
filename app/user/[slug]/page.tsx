@@ -85,13 +85,13 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
               </div>
             </div>
           </div>
-          <div className="flex flex-row gap-16">
+          <div className="flex flex-row gap-16 w-full">
             {/** Left Side */}
             <div
               id="Left Side"
-              className="basis-2/3 flex flex-col gap-6 flex-shrink-0"
+              className="basis-2/3 flex flex-col gap-6 flex-shrink-0 "
             >
-              <Section header="Favorite Games">
+              <Section header="Favorite Games" className="w-full">
                 <RowGames games={user.games} limit={4}></RowGames>
               </Section>
               <Section header="Recent Games">
@@ -145,7 +145,7 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
             {/** Right Side */}
             <div
               id="Right Side"
-              className="flex flex-col gap-6 basis-1/3 flex-grow-0"
+              className="flex flex-col gap-6 basis-1/3 flex-grow-0 w-full"
             >
               {user.backlog.length > 0 && (
                 <Section
@@ -234,25 +234,28 @@ const Diary = ({ reviews }: { reviews: Array<ReviewWithGame> }) => {
               })}{" "}
             </h4>{" "}
             <dl className="text-list flex flex-col gap-2">
-              {month.map((entry) => (
-                <div
-                  className="grid grid-cols-[25px_minmax(0px,_1fr)] gap-2"
-                  key={entry.id}
-                >
-                  <dt className="place-content-start text-right text-popover">
-                    {entry.createdAt.getDay()}
-                  </dt>
-                  <dd className="">
-                    <Link
-                      className="hover:text-cyan-400"
-                      href={`/game/${entry.Game.slug}`}
-                    >
-                      {" "}
-                      {entry.Game.name}
-                    </Link>
-                  </dd>
-                </div>
-              ))}
+              {month.map((entry) => {
+                console.log("day: " + entry.createdAt.getDate());
+                return (
+                  <div
+                    className="grid grid-cols-[25px_minmax(0px,_1fr)] gap-2"
+                    key={entry.id}
+                  >
+                    <dt className="place-content-start text-right text-popover">
+                      {entry.createdAt.getDate()}
+                    </dt>
+                    <dd className="">
+                      <Link
+                        className="hover:text-cyan-400"
+                        href={`/game/${entry.Game.slug}`}
+                      >
+                        {" "}
+                        {entry.Game.name}
+                      </Link>
+                    </dd>
+                  </div>
+                );
+              })}
             </dl>
           </li>
         ))}
