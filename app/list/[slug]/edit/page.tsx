@@ -1,7 +1,23 @@
-import NewListForm from "@/components/lists/newlist";
+import { getSession } from "@/app/api/auth/[...nextauth]/auth";
+import EditListForm from "@/components/lists/editList";
+import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
-const EditList = ({ params }: { params: { slug: string } }) => {
+type ListWithGames = Prisma.ListGetPayload<{
+  include: { games: { include: { game: true } } };
+}>;
+
+const EditList = async ({ params }: { params: { slug: string } }) => {
   const slug = params.slug;
+  const session = await getSession();
+  const email = session?.user.email;
+  const list = await prisma.list.findUniqueOrThrow({
+    where: { slug: slug },
+    include: {
+      author: true,
+      games: { include: { game: true } },
+    },
+  });
   return (
     <main>
       <header id="Header Filler Block" className="w-full h-12 bg-primary" />
@@ -11,7 +27,7 @@ const EditList = ({ params }: { params: { slug: string } }) => {
             {" "}
             {`Edit List`}{" "}
           </h1>
-          <NewListForm />
+          <EditListForm list={list} />
         </section>
       </div>
     </main>

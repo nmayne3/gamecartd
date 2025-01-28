@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Game, Prisma, Review } from "@prisma/client";
 import BoxArt from "@/components/boxartalt";
 import { ReviewCardUserPage } from "@/components/reviewcardalt";
-import { ListGames } from "@/components/displaylist";
+import { BacklogGames, ListGames } from "@/components/displaylist";
 import { FaCalendar } from "react-icons/fa6";
 import { RatingsChart } from "@/components/ratingschart";
 
@@ -79,10 +79,12 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
                 <h1>{user.reviews.length}</h1>
                 <h2 className="text-xs">{"Reviews"}</h2>
               </div>
-              <div id="List Counter" className="place-items-center px-2 ">
-                <h1>{user.lists.length}</h1>
-                <h2 className="text-xs">{"Lists"}</h2>
-              </div>
+              <Link href={`${user.slug}/lists`}>
+                <div id="List Counter" className="place-items-center px-2 ">
+                  <h1>{user.lists.length}</h1>
+                  <h2 className="text-xs">{"Lists"}</h2>
+                </div>
+              </Link>
             </div>
           </div>
           <div className="flex flex-row gap-16 w-full">
@@ -155,7 +157,7 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
                   more={user.backlog.length.toString()}
                 >
                   <Link href={`/user/${user.id}/backlog/`}>
-                    <ListGames backlog={user.backlog} />
+                    <BacklogGames backlog={user.backlog} />
                   </Link>
                 </Section>
               )}

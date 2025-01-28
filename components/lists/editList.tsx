@@ -7,21 +7,19 @@ import { z } from "zod";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Checkbox } from "../ui/checkbox";
-import Searchbar from "./searchgame";
-import { Game } from "@prisma/client";
-import BoxArt from "../boxartalt";
-import { MouseEvent, useRef, useState } from "react";
-import { GetGameCombo } from "@/app/api/games/actions";
+import { Game, List, Prisma } from "@prisma/client";
+import { useRef, useState } from "react";
 import AddGame from "./addGame";
-import { createList } from "@/app/api/lists/actions";
-import { register } from "module";
-import { redirect, useRouter } from "next/navigation";
+import { createList, updateList } from "@/app/api/lists/actions";
 
 const CHECKMARK = "✅";
 const MARK = "✕";
 
-const NewListForm = () => {
-  const router = useRouter();
+type ListWithGames = Prisma.ListGetPayload<{
+  include: { games: { include: { game: true } } };
+}>;
+
+const EditListForm = ({ list }: { list: ListWithGames }) => {
   const FormSchema = z.object({
     name: z.string().max(100, "Review must be no more than 100 characters"),
     description: z
@@ -50,27 +48,27 @@ const NewListForm = () => {
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     console.log("");
     const game_ids = refGames.current?.map((game) => game.id);
-    const list = await createList(
+    const review = await updateList(
       data.name,
+      list.slug,
       data.description,
       game_ids,
       data.ranked
     );
-    if (list) {
+    if (review) {
       toast({
-        title: "List " + data.name + "  Created " + CHECKMARK,
+        title: "List " + data.name + "  Updated " + CHECKMARK,
       });
-      router.push(`/list/${list.slug}/edit`);
     } else {
       toast({
         title: "Error: ❌",
-        description: "Failed to create List",
+        description: "Failed to update List",
       });
     }
   };
 
   const refGames = useRef<Game[]>();
-  const [ranked, setRanked] = useState(false);
+  const [ranked, setRanked] = useState(list.ranked);
 
   return (
     <div>
@@ -82,11 +80,15 @@ const NewListForm = () => {
           <div className="basis-1/2 w-full flex flex-col gap-4">
             <label>
               Name
-              <Input placeholder="" {...form.register("name")} />
+              <Input
+                defaultValue={list.name}
+                placeholder=""
+                {...form.register("name")}
+              />
             </label>
             <label>
               Tags
-              <Input placeholder="e.g. wizards" />
+              <Input defaultValue={list.tags} placeholder="e.g. wizards" />
             </label>
 
             <Controller
@@ -98,6 +100,7 @@ const NewListForm = () => {
                     {" "}
                     <label className="peer"> Ranked list </label>
                     <Checkbox
+                      defaultChecked={list.ranked}
                       className="peer-hover:bg-border"
                       checked={field.value}
                       onCheckedChange={field.onChange}
@@ -120,6 +123,7 @@ const NewListForm = () => {
             </label>
             <Textarea
               className="h-full"
+              defaultValue={list.description}
               placeholder=""
               {...form.register("description")}
             />
@@ -128,6 +132,7 @@ const NewListForm = () => {
         <AddGame
           refGames={refGames}
           ranked={ranked}
+          incomingGames={list.games.map((entry) => entry.game)}
           {...form.register("games")}
         />
       </form>
@@ -135,4 +140,4 @@ const NewListForm = () => {
   );
 };
 
-export default NewListForm;
+export default EditListForm;

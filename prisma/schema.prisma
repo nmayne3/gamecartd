@@ -83,6 +83,7 @@ model User {
   likedGames    Game[]    @relation("LikedGames")
   backlog       Game[]    @relation("BackloggedGames")
   ratings       Rating[]
+  likedLists    List[]    @relation("LikedLists")
 }
 
 model VerificationToken {
@@ -201,9 +202,10 @@ model List {
   timestamp   DateTime   @default(now())
   updatedAt   DateTime?  @updatedAt
   tags        String[]
-  likedBy     String[]
   games       ListItem[]
   ranked      Boolean    @default(false)
+
+  likedBy User[] @relation("LikedLists")
 }
 
 model ListItem {

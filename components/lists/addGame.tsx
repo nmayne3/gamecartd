@@ -13,14 +13,16 @@ const MARK = "✕";
 const AddGame = ({
   refGames,
   ranked,
+  incomingGames,
 }: {
   refGames: MutableRefObject<any>;
   ranked?: boolean;
+  incomingGames?: Game[];
 }) => {
   // Todo: Add inital games included in slug
   console.log(refGames);
   const createInitialGames = () => {
-    const initialGames = Array<Game>();
+    const initialGames = incomingGames ? incomingGames : Array<Game>();
     return initialGames;
   };
 
