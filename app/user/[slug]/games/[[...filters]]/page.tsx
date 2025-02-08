@@ -21,6 +21,7 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import { DropdownTab } from "@/components/dropdown";
 
 export const metadata: Metadata = {
   title: "Games • Gamecartd",
@@ -171,41 +172,26 @@ const FiltersMenubar = async ({ userSlug }: { userSlug: string }) => {
   });
 
   return (
-    <Menubar>
-      <MenubarMenu>
-        <MenubarTrigger> Year </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem>
-            New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem>New Window</MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>Share</MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem>Print</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger> Rating </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem>Ascending</MenubarItem>
-          <MenubarItem>Descending</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger> Genre </MenubarTrigger>
-        <MenubarContent>
-          {genres.map((genre) => {
-            return (
-              <MenubarItem key={genre.slug}>
-                <Link href={`/user/${userSlug}/games/genres/${genre.slug}/`}>
-                  {genre.name}
-                </Link>
-              </MenubarItem>
-            );
-          })}
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
+    <div className={`flex flex-row text-xs`}>
+      <DropdownTab name="Year"></DropdownTab>
+      <DropdownTab name="Genre">
+        {genres.map((genre) => {
+          return (
+            <li key={genre.slug} className="">
+              <Link
+                className="dropdown-link"
+                href={`/user/${userSlug}/games/genres/${genre.slug}/`}
+              >
+                {genre.name}
+              </Link>
+            </li>
+          );
+        })}
+      </DropdownTab>
+      <DropdownTab name="Platform"></DropdownTab>
+      <div className="flex flex-row gap-1">
+        <DropdownTab name="Sort By"></DropdownTab>
+      </div>
+    </div>
   );
 };

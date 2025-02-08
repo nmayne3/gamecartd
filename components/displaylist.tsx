@@ -1,8 +1,19 @@
 "use client";
 
-import { Game } from "@prisma/client";
+import { Game, List, Prisma } from "@prisma/client";
 import { Section } from "./section";
 import Image from "next/image";
+import UserNameBadge from "./user/userNameBadge";
+import { FaHeart } from "react-icons/fa6";
+import Link from "next/link";
+
+type ListWithGames = Prisma.ListGetPayload<{
+  include: {
+    games: { include: { game: true } };
+    author: true;
+    _count: { select: { likedBy: true } };
+  };
+}>;
 
 export const ListGames = ({
   games,
@@ -135,6 +146,44 @@ export const BacklogGames = ({ backlog }: { backlog: Game[] }) => {
         style={{ zIndex: 10 }}
         className="smooth-transition outline outline-0.5 outline-dark-grey rounded-sm-md hover:-outline-offset-2 hover:outline-2 hover:outline-accent-green absolute top-0 bottom-0 w-full"
       />
+    </div>
+  );
+};
+
+// Component which displays list preview alongside name and info
+export const ListBlock = ({
+  list,
+  id,
+}: {
+  list: ListWithGames;
+  id?: string;
+}) => {
+  return (
+    <div className="flex flex-col w-full py-2" id={id}>
+      <Link href={`/list/${list.slug}`}>
+        <ListGames games={list.games} />
+      </Link>
+      <div className="w-full">
+        <Link href={`/list/${list.slug}`}>
+          <h2 className="font-semibold text-neutral-50"> {list.name} </h2>
+        </Link>
+        <span className="flex flex-row gap-2 place-items-center">
+          <UserNameBadge user={list.author} />
+          <small className="text-xs text-menu-primary">
+            {" "}
+            {`${list.games.length} games`}{" "}
+          </small>
+          {list._count.likedBy > 0 && (
+            <div className="flex flex-row gap-1 items-center">
+              <FaHeart className="fill-menu-primary scale-80" />
+              <small className="text-xs text-menu-primary">
+                {" "}
+                {list._count.likedBy}{" "}
+              </small>
+            </div>
+          )}
+        </span>
+      </div>
     </div>
   );
 };

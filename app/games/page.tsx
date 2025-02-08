@@ -1,8 +1,13 @@
 import { GetGames } from "@/igdb/api";
-import { Section } from "@/components/section";
+import { Section, SectionHeader } from "@/components/section";
 import RowGames from "@/components/rowgames";
 import BrowseMenu from "@/components/browsemenu";
 import type { Metadata } from "next";
+import prisma from "@/lib/prisma";
+import { ReviewCard } from "@/components/reviewcardalt";
+import ProfileBadge from "@/components/user/ProfileBadge";
+import { Input } from "@/components/ui/input";
+import Searchbar from "@/components/lists/searchgame";
 
 export const metadata: Metadata = {
   title: "Games • Gamecartd",
@@ -26,6 +31,25 @@ const GamesPage = async () => {
     limit: 12,
   });
 
+  const popularReviews = await prisma.review.findMany({
+    include: {
+      Game: true,
+      author: true,
+      _count: { select: { likedBy: true } },
+      likedBy: true,
+    },
+    orderBy: { likedBy: { _count: "desc" } },
+    take: 6,
+  });
+
+  const popularUsers = await prisma.user.findMany({
+    include: {
+      _count: { select: { games: true, reviews: true } },
+      reviews: true,
+    },
+    take: 6,
+  });
+
   return (
     <main className="">
       <header id="Header Filler Block" className="w-full h-12 bg-primary" />
@@ -37,7 +61,10 @@ const GamesPage = async () => {
               Browse By
               <BrowseMenu />
             </div>
-            <div>Find Movie</div>
+            <div className="flex flex-row items-center gap-2">
+              {`Find a Game`}
+              <Searchbar className="h-full" />
+            </div>
           </div>
 
           <Section header="Top Games">
@@ -47,6 +74,23 @@ const GamesPage = async () => {
           <Section header="Recently Released">
             <RowGames games={RecentReleases} />
           </Section>
+
+          <div className="flex flex-row gap-16">
+            {/** Left Side */}
+            <Section header={"Popular Reviews this week"} className="basis-3/4">
+              {popularReviews.map((review) => (
+                <ReviewCard key={review.id} review={review} />
+              ))}
+            </Section>
+            {/** Right side */}
+            <div className="basis-1/4">
+              <Section header="Popular Reviewers" className="basis-1/4">
+                {popularUsers.map((user) => (
+                  <ProfileBadge key={user.slug} user={user} />
+                ))}
+              </Section>
+            </div>
+          </div>
         </div>
       </div>
     </main>

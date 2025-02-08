@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FaHeart, FaStar, FaComment, FaStarHalfStroke } from "react-icons/fa6";
 import ProfilePicture from "@/assets/archie.jpg";
-import { Review, User } from "@prisma/client";
+import { Prisma, Review, User } from "@prisma/client";
 import { GetUser, GetUserFromID } from "@/app/api/games/actions";
 import Link from "next/link";
 import BoxArt from "./boxartalt";
@@ -11,6 +11,22 @@ import prisma from "@/lib/prisma";
 import { LikeButton } from "./reviewbuttons";
 import { getSession } from "@/app/api/auth/[...nextauth]/auth";
 import { Suspense } from "react";
+import UserNameBadge from "./user/userNameBadge";
+
+type ReviewWithAllInfo = Prisma.ReviewGetPayload<{
+  include: {
+    Game: true;
+    author: true;
+    _count: { select: { likedBy: true } };
+    likedBy: true;
+  };
+}>;
+
+type UserWithLikedReviews = Prisma.UserGetPayload<{
+  include: {
+    likedPosts: true;
+  };
+}>;
 
 export const ReviewCardGamePage = async ({ review }: { review: Review }) => {
   const user = await GetUserFromID(review.authorId);
@@ -146,11 +162,9 @@ export const ReviewCardUserPage = async ({
   return (
     <section id="Review Card" className="flex flex-row py-4">
       {/** Profile Image / Left */}
-      {user.image && (
-        <Link href={`/game/${game.slug}`} className="w-20 h-fit flex-shrink-0">
-          <BoxArt game={game} />
-        </Link>
-      )}
+      <Link href={`/game/${game.slug}`} className="w-20 h-fit flex-shrink-0">
+        <BoxArt game={game} />
+      </Link>
       {/** Review section / Right */}
       <div className="flex flex-col justify-start gap-3 px-4 text-sm">
         {/** Review Header */}
@@ -186,6 +200,77 @@ export const ReviewCardUserPage = async ({
         </span>
         {/** Review text */}
         <p className="text-md"> {review.content}</p>
+        {/** Number of likes on the review */}
+        <span className="flex flex-row gap-2 place-items-center text-xs">
+          <LikeButton
+            review={review}
+            initialState={initialLikedState}
+            initialCount={initialLikeCount}
+          />
+        </span>
+      </div>
+    </section>
+  );
+};
+
+// Review Card that already includes necessary data to avoid redundant fetches
+export const ReviewCard = async ({
+  review,
+  user,
+}: {
+  review: ReviewWithAllInfo;
+  user?: UserWithLikedReviews;
+}) => {
+  const initialLikeCount = review._count.likedBy;
+  const initialLikedState = user ? user.likedPosts.includes(review) : false;
+  return (
+    <section id="Review Card" className="flex flex-row py-4">
+      {/** Profile Image / Left */}
+      <Link
+        href={`/game/${review.Game.slug}`}
+        className="w-20 h-fit flex-shrink-0"
+      >
+        <BoxArt game={review.Game} />
+      </Link>
+      {/** Review section / Right */}
+      <div className="flex flex-col justify-start gap-3 px-4 text-sm">
+        {/** Review Header */}
+        <h2 className="font-dm-serif font-semibold text-white text-xl">
+          {" "}
+          <Link
+            href={`/game/${review.Game.slug}`}
+            className="hover:text-cyan-400"
+          >
+            {review.Game.name}{" "}
+          </Link>
+          {review.Game.first_release_date && (
+            <small className="font-sans font-light text-discrete-grey">{`${review.Game.first_release_date.getFullYear()}`}</small>
+          )}
+        </h2>
+        {/** Review Scoreboard */}
+        <span className="flex flex-row gap-2 place-items-center text-discrete-grey/70">
+          <UserNameBadge user={review.author} />
+          {/** Star Rating */}
+          {review.rating && <StarRating rating={review.rating} />}
+          {/** CHECK IF AUTHOR LIKED THE GAME */}
+          {review.liked && <FaHeart className="fill-accent-orange" />}
+          {/** Review Date */}
+          <small>
+            {" "}
+            {`Played ${review.createdAt.toLocaleDateString("en-gb", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })}`}{" "}
+          </small>
+          {/** Number of comments on review */}
+          <h4 className="flex flex-row place-items-center gap-0.5">
+            <FaComment className="fill-discrete-grey" />
+            {"10"}
+          </h4>
+        </span>
+        {/** Review text */}
+        <p className="text-medium"> {review.content}</p>
         {/** Number of likes on the review */}
         <span className="flex flex-row gap-2 place-items-center text-xs">
           <LikeButton

@@ -47,27 +47,70 @@ const Navbar = () => {
           )}
           {/** Profile Section */}
           {session.status == "authenticated" && (
-            <div className="uppercase flex flex-row gap-2 place-items-center">
-              <DropdownTab
-                name={session.data.user?.name}
-                icon_src={session.data.user?.image}
-              >
+            <DropdownTab
+              name={session.data.user?.name}
+              icon_src={session.data.user?.image}
+            >
+              <li className="dropdown">
+                {" "}
+                <Link className="dropdown-link" href={`/`}>
+                  {" "}
+                  Home{" "}
+                </Link>
+              </li>
+              <li className="dropdown">
                 <Link
                   href={`/user/${session?.data.user.slug}`}
-                  className="uppercase w-full text-left"
+                  className="dropdown-link "
                 >
                   {" "}
                   Profile{" "}
                 </Link>
+              </li>
+              <li className="hover:bg-menu-primary hover:text-white">
+                {" "}
+                <Link
+                  className="dropdown-link"
+                  href={`/user/${session?.data.user.slug}/games`}
+                >
+                  {" "}
+                  Games{" "}
+                </Link>
+              </li>
+              <li className="hover:bg-menu-primary hover:text-white">
+                {" "}
+                <Link
+                  href={`/user/${session?.data.user.slug}/backlog`}
+                  className="dropdown-link "
+                >
+                  {" "}
+                  Backlog{" "}
+                </Link>
+              </li>
+              <li className="hover:bg-menu-primary hover:text-white">
+                {" "}
+                <Link
+                  href={`/user/${session?.data.user.slug}/lists`}
+                  className="dropdown-link "
+                >
+                  {" "}
+                  Lists{" "}
+                </Link>
+              </li>
+              <li className="h-2 content-center m-auto">
+                {" "}
+                <hr className="border-menu-primary" />{" "}
+              </li>
+              <li className="dropdown">
                 <button
-                  className="uppercase w-full text-left"
+                  className=" dropdown-link w-full text-left"
                   onClick={() => signOut()}
                 >
                   {" "}
                   Log Out{" "}
                 </button>
-              </DropdownTab>
-            </div>
+              </li>
+            </DropdownTab>
           )}
           {/** Directory Section */}
           {links.map((link) => (
@@ -75,8 +118,7 @@ const Navbar = () => {
               href={link.url}
               key={link.title}
               className={`${
-                pathName === link.url &&
-                "text-white underline underline-offset-4"
+                pathName === link.url && "text-white"
               } hover:text-white`}
             >
               {link.title}

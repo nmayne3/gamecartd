@@ -191,6 +191,7 @@ export async function GetUserFromID(id: string) {
   return user;
 }
 
+// Creates a review for a given game,
 export async function CreateReview({
   content,
   gameId,
@@ -205,25 +206,37 @@ export async function CreateReview({
     return null;
   }
 
+  // fetches user along with their rating and likes
   const author = await prisma.user.findUnique({
     where: { email: session.user.email },
+    include: {
+      ratings: { where: { gameId: gameId } },
+      _count: { select: { likedGames: { where: { id: gameId } } } },
+    },
   });
   if (!author) {
     console.log("user not found.");
     return null;
   }
 
+  const constructedRating =
+    author.ratings.length > 0 ? author.ratings[0].rating : null;
+
+  // Creates review with score and liked status at the time of rating
   const review = await prisma.review.create({
     data: {
       content: content,
       authorId: author.id,
       gameId: gameId,
+      rating: constructedRating,
+      liked: author._count.likedGames > 0,
     },
   });
 
   return review;
 }
 
+// Adds game from IGDB to local db
 export async function AddGame(game: Game) {
   const first_release_date = game.first_release_date
     ? new Date(game.first_release_date * 1000)
@@ -425,6 +438,7 @@ export async function AddGame(game: Game) {
   return newGame;
 }
 
+// Creates/Overwrites a user's rating for a game
 export async function rateGame(
   user_id: string,
   game_id: string,

@@ -18,9 +18,10 @@ export const DropdownTab = ({
         id={`${name} dropdown tab`}
         className={`${className} inline-flex flex-col`}
       >
+        {/** Unhovered menu */}
         <Tab
           name={name}
-          className={`group/drop group-hover/drop:bg-secondary rounded-sm rounded-b-none`}
+          className={`group/drop group-hover/drop:bg-transparent rounded-sm bg-transparent rounded-b-none`}
         >
           {icon_src && (
             <Image
@@ -32,26 +33,27 @@ export const DropdownTab = ({
             />
           )}
         </Tab>
-        <div className="absolute group-hover/drop:shadow-2xl  ">
-          <Tab
-            name={name}
-            className={`hidden group/drop group-hover/drop:block group-hover/drop:bg-menu-primary rounded-sm rounded-b-none border-b-1 group-hover/drop:border-secondary `}
-          >
-            {icon_src && (
-              <Image
-                src={icon_src}
-                alt="Profile Picture"
-                className="outline-white/10 -outline-offset-1  outline-1 outline rounded-full"
-                width={32}
-                height={32}
-              />
-            )}
-          </Tab>
+        {/** Dropdown menu (appears when hovered) */}
+        <div className="absolute hidden group-hover/drop:block group-hover/drop:text-dropdown-foreground *:bg-dropdown bg-popover-foreground w-fit -mt-[1px] pt-[1px] rounded-[3px] heavy-shadow dropdown-menu z-10">
           <div
             id={`${name} dropdown content`}
-            className={`hidden group-hover/drop:inline-block overflow-hidden w-full rounded-b-sm`}
+            className={`overflow-hidden min-w-fit w-full rounded-[3px] `}
           >
-            <ul className="max-h-32 px-2 py-1 bg-menu-primary rounded-b-sm divide-y divide-dark-grey z-10 drop-shadow-md capitalize overflow-y-scroll overflow-hidden min-w-fit w-full">
+            <Tab
+              name={name}
+              className={` group-hover/drop:bg-dropdown text-white rounded-b-none border-b-1  group-hover/drop:border-menu-primary `}
+            >
+              {icon_src && (
+                <Image
+                  src={icon_src}
+                  alt="Profile Picture"
+                  className="outline-menu-primary -outline-offset-1 outline-1 outline rounded-full"
+                  width={32}
+                  height={32}
+                />
+              )}
+            </Tab>
+            <ul className="*:dropdown rounded-b-[3px] divide-menu-primary z-10 font-normal capitalize  overflow-hidden w-full *:w-full *:whitespace-nowrap py-1">
               {children}
             </ul>
           </div>

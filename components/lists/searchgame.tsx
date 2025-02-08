@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ChangeEvent,
   MouseEventHandler,
@@ -19,7 +21,7 @@ const Searchbar = ({
   onClick,
 }: {
   className?: string;
-  onClick: (game: string) => void;
+  onClick?: (game: string) => void;
 }) => {
   const [inputElem, setInputElem] = useState("");
   const [resultingGames, setResultingGames] = useState(Array<Game>);
@@ -57,23 +59,41 @@ const Searchbar = ({
         type="text"
         id="search"
         placeholder="Enter name of game..."
-        className={`w-full h-full pl-3 input-field peer rounded-l-none ${className}`}
-        style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+        className={`w-full h-full pl-3 input-field peer ${className}`}
+        style={
+          // prevents rounded edges when used on list page
+          onClick ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } : {}
+        }
       />
       {resultingGames.length > 0 && (
-        <div className="absolute pt-1 hidden peer-focus-within:block hover:block drop-shadow-md z-10">
-          <ul className="bg-menu-primary divide-y text-xxs divide-dark-grey rounded-md capitalize overflow-hidden z-10">
-            {resultingGames.map((game) => (
-              <SearchResult
-                key={game.slug}
-                onClick={() => {
-                  onClick(game.slug);
-                }}
-              >
-                {" "}
-                {`${game.name} (${GetReleaseYear(game)})`}{" "}
-              </SearchResult>
-            ))}
+        <div className="absolute pt-1 hidden peer-focus-within:block hover:block drop-shadow-md max-w-72 z-10">
+          <ul className="bg-menu-primary divide-y text-xs divide-dark-grey rounded-md capitalize overflow-hidden w-full z-10">
+            {resultingGames.map((game) => {
+              if (onClick) {
+                return (
+                  <SearchResult
+                    key={game.slug}
+                    onClick={() => {
+                      onClick(game.slug);
+                    }}
+                  >
+                    {" "}
+                    {`${game.name} (${GetReleaseYear(game)})`}{" "}
+                  </SearchResult>
+                );
+              } else {
+                return (
+                  <li className="w-full bg-transparent hover:bg-accent-green text-white font-light  z-50 ">
+                    <Link
+                      className={`w-full block p-2`}
+                      href={`/game/${game.slug}`}
+                    >
+                      {`${game.name} (${GetReleaseYear(game)})`}{" "}
+                    </Link>
+                  </li>
+                );
+              }
+            })}
           </ul>
         </div>
       )}

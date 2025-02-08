@@ -7,14 +7,18 @@ import Link from "next/link";
 import RowGames from "@/components/rowgames";
 import { getAccessToken } from "@/igdb/auth";
 import { client_id } from "@/igdb/keys";
-import { Section } from "@/components/section";
-import { ReviewCard } from "@/components/reviewcard";
+import { Section, SectionHeader } from "@/components/section";
 import { GetGames } from "@/igdb/api";
 import { GetReleaseYear } from "@/igdb/helpers";
 import Backdrop from "@/components/backdrop";
 import { getSession } from "./api/auth/[...nextauth]/auth";
+import prisma from "@/lib/prisma";
+import { ListBlock } from "@/components/displaylist";
+import { ReviewCard } from "@/components/reviewcardalt";
+import ProfileBadge from "@/components/user/ProfileBadge";
 
 export default async function Home() {
+  // Get games from IGDB to ensure they are always up to date
   const FeaturedGames = await GetGames({
     fields:
       "name, slug, first_release_date, aggregated_rating, aggregated_rating_count, cover.*, artworks.*",
@@ -24,7 +28,44 @@ export default async function Home() {
   });
   const bgGame = FeaturedGames[0];
   const bg = bgGame.artworks[0];
+
+  // Get user info
   const session = await getSession();
+  const user = session?.user.email
+    ? await prisma.user.findUnique({
+        where: { email: session.user.email },
+        include: { likedPosts: true },
+      })
+    : null;
+
+  const popularLists = await prisma.list.findMany({
+    include: {
+      author: true,
+      games: { include: { game: true } },
+      _count: { select: { likedBy: true } },
+    },
+    orderBy: { likedBy: { _count: "desc" } },
+    take: 3,
+  });
+
+  const popularReviews = await prisma.review.findMany({
+    include: {
+      Game: true,
+      author: true,
+      _count: { select: { likedBy: true } },
+      likedBy: true,
+    },
+    orderBy: { likedBy: { _count: "desc" } },
+    take: 6,
+  });
+
+  const popularUsers = await prisma.user.findMany({
+    include: {
+      _count: { select: { games: true, reviews: true } },
+      reviews: true,
+    },
+    take: 6,
+  });
   return (
     <main className="flex min-h-screen flex-col max-w-screen-2xl items-center gap-8 mx-auto">
       {/** Backdrop Image Container */}
@@ -35,8 +76,10 @@ export default async function Home() {
           style={{ writingMode: "vertical-rl" }}
         >
           {" "}
-          {bgGame.name}
-          {` (${GetReleaseYear(bgGame)})`}
+          <Link href={`/game/${bgGame.slug}`}>
+            {bgGame.name}
+            {` (${GetReleaseYear(bgGame)})`}
+          </Link>
         </figcaption>
       </figure>
       {/** Content */}
@@ -69,15 +112,24 @@ export default async function Home() {
           <RowGames games={FeaturedGames} />
         </div>
         <div className="flex flex-row gap-16">
-          <Section header={"Popular Reviews this week"} className="basis-4/5">
-            <ReviewCard />
-            <ReviewCard />
-            <ReviewCard />
-            <ReviewCard />
-            <ReviewCard />
-            <ReviewCard />
+          {/** Left Side */}
+          <Section header={"Popular Reviews this week"} className="basis-3/4">
+            {popularReviews.map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
           </Section>
-          <Section header="Popular Reviewers" className="basis-1/4"></Section>
+          {/** Right side */}
+          <div className="basis-1/4">
+            <SectionHeader title="Popular Lists" className="divide-y-0" />{" "}
+            {popularLists.map((list) => (
+              <ListBlock key={list.slug} id={list.slug} list={list} />
+            ))}{" "}
+            <Section header="Popular Reviewers" className="basis-1/4 py-12">
+              {popularUsers.map((user) => (
+                <ProfileBadge key={user.slug} user={user} />
+              ))}
+            </Section>
+          </div>
         </div>
       </div>
     </main>

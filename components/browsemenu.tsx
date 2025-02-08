@@ -3,8 +3,9 @@
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { MouseEventHandler, useCallback } from "react";
 import { FaAngleDown } from "react-icons/fa6";
+import { DropdownTab } from "./dropdown";
 
-const BrowseMenu = () => {
+const BrowseMenu = ({ className }: { className?: string }) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -37,7 +38,7 @@ const BrowseMenu = () => {
     return (
       <li>
         <button
-          className="hover:bg-secondary w-full h-full text-start hover:text-white p-1 py-0.5"
+          className="dropdown-link w-full h-full text-start hover:text-white py-0.5"
           onClick={() => {
             if (param && value)
               handleButton({ inParams: [{ param: param, value: value }] });
@@ -52,7 +53,9 @@ const BrowseMenu = () => {
   };
 
   return (
-    <div className="flex flex-row bg-primary/25 outline-1 outline outline-dark-grey divide-x divide-dark-grey rounded-sm text-xxs">
+    <div
+      className={`flex flex-row bg-primary/25 outline-1 outline outline-dark-grey divide-x divide-dark-grey rounded-sm text-xs ${className}`}
+    >
       <DropdownTab name="Year">
         <Listing
           param="filter"
@@ -143,7 +146,7 @@ const BrowseMenu = () => {
         </Listing>
       </DropdownTab>
 
-      <Tab name="Popular"> </Tab>
+      <DropdownTab name="Popular"> </DropdownTab>
       <DropdownTab name="Genre">
         <Listing param="filter" value="genres = [2]">
           {" "}
@@ -243,49 +246,6 @@ const BrowseMenu = () => {
 };
 
 export default BrowseMenu;
-
-const DropdownTab = ({
-  name,
-  children,
-}: {
-  name: string;
-  children?: React.ReactNode;
-}) => {
-  return (
-    <div id={`${name} dropdown tab`} className="group">
-      <Tab name={name} className={`group group-hover:bg-secondary`}></Tab>
-      <div
-        id={`${name} dropdown content`}
-        className={`hidden group-hover:block overflow-hidden`}
-      >
-        <ul className="max-h-32 bg-menu-primary rounded-b-sm absolute divide-y divide-dark-grey z-10 drop-shadow-md capitalize overflow-y-scroll overflow-hidden">
-          {children}
-        </ul>
-      </div>
-    </div>
-  );
-};
-
-const Tab = ({
-  name,
-  children,
-  className,
-}: {
-  name: string;
-  children?: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={`${className}`}>
-      <div
-        className={`bg-transparent uppercase flex flex-row p-1 py-0.5 place-items-center gap-1`}
-      >
-        {name}
-        <FaAngleDown />
-      </div>
-    </div>
-  );
-};
 
 const getTime = (Year: number, Month?: number, Day?: number) => {
   Month = Month || 1;

@@ -49,6 +49,10 @@ const config: Config = {
         "menu-primary": "#678",
         background: "var(--background)",
         foreground: "var(--foreground)",
+        dropdown: {
+          DEFAULT: "var(--dropdown)",
+          foreground: "var(--dropdown-foreground)",
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

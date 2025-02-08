@@ -180,6 +180,8 @@ model Review {
   replay    Boolean  @default(false) // Is this a replay of a game?
   completed Boolean  @default(false) // Did user complete the game?
   likedBy   User[]   @relation("LikedPosts") //Users that liked the post
+  rating    Float? // Rating at time of review (allows users to re-score games upon subsequent playthroughs)
+  liked     Boolean  @default(false) // Did the user 'like' the game at the time of review? 
 }
 
 model Rating {
@@ -196,8 +198,8 @@ model List {
   id          String     @id @default(cuid())
   name        String
   slug        String     @unique
-  author      User?      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String?
+  author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
   description String
   timestamp   DateTime   @default(now())
   updatedAt   DateTime?  @updatedAt
