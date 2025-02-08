@@ -83,7 +83,10 @@ const Searchbar = ({
                 );
               } else {
                 return (
-                  <li className="w-full bg-transparent hover:bg-accent-green text-white font-light  z-50 ">
+                  <li
+                    key={game.slug}
+                    className="w-full bg-transparent hover:bg-accent-green text-white font-light  z-50 "
+                  >
                     <Link
                       className={`w-full block p-2`}
                       href={`/game/${game.slug}`}
