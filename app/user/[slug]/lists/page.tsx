@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { SectionHeader } from "@/components/section";
 import PageButtons from "@/components/pagebutton";
 import Link from "next/link";
-import { ListGames } from "@/components/displaylist";
+import { ListGames } from "@/components/lists/displaylist";
 
 // Page for browsing a user's created lists
 const ListsPage = async ({ params }: { params: { slug: string } }) => {

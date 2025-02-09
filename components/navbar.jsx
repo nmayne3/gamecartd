@@ -14,7 +14,6 @@ import { DropdownTab } from "./dropdown";
 const links = [
   { url: "/games", title: "Games" },
   { url: "/lists", title: "Lists" },
-  { url: "/members", title: "Members" },
 ];
 
 const Navbar = () => {

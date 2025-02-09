@@ -10,7 +10,7 @@ const UserNameBadge = ({ user }: { user: User }) => {
           <Image
             src={user.image}
             alt="Profile Picture"
-            className="w-5 h-5 border-opacity-100 border-white outline-white/10 -outline-offset-1  outline-1 outline rounded-full aspect-square"
+            className="w-5 h-5 border-opacity-100 border-white outline-white/10 -outline-offset-1  outline-1 outline rounded-full aspect-square profile-badge"
             width={32}
             height={32}
           />

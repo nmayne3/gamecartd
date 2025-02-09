@@ -1,9 +1,9 @@
 "use client";
 
 import { Game, List, Prisma } from "@prisma/client";
-import { Section } from "./section";
+import { Section } from "../section";
 import Image from "next/image";
-import UserNameBadge from "./user/userNameBadge";
+import UserNameBadge from "../user/userNameBadge";
 import { FaHeart } from "react-icons/fa6";
 import Link from "next/link";
 
@@ -18,6 +18,7 @@ type ListWithGames = Prisma.ListGetPayload<{
 export const ListGames = ({
   games,
   className,
+  big,
 }: {
   games: ({
     game: {
@@ -37,7 +38,11 @@ export const ListGames = ({
     createdAt: Date;
   })[];
   className?: string;
+  big?: boolean;
 }) => {
+  // set default to false
+  big = big ? big : false;
+
   const placeholders = [];
   for (let i = 0; i < 5 - games.length; i++) {
     placeholders.push(
@@ -48,7 +53,7 @@ export const ListGames = ({
         style={{ aspectRatio: 81.06 / 108.09, zIndex: 5 - games.length - i }}
       >
         <div
-          className={`rounded-sm-md h-full object-cover  aspec outline outline-0.5 outline-dark-grey`}
+          className={`rounded-sm-md h-full object-cover outline outline-0.5 outline-dark-grey heavy-shadow`}
         >
           {" "}
           {""}
@@ -61,14 +66,18 @@ export const ListGames = ({
       <ul
         id="List Images"
         style={{}}
-        className="grid grid-cols-5  justify-between rounded-sm-md shadow-xl mr-8 relative"
+        className={`grid grid-cols-5  justify-between rounded-sm-md shadow-xl ${
+          big == true ? "mr-32" : "mr-8"
+        } relative`}
       >
         {games.slice(0, 5).map((entry, index) => {
           console.log(index);
           const game = entry.game;
           return (
             <li
-              className={` w-fit -mr-8 left-8 shadow-2xl `}
+              className={` w-fit ${
+                big == true ? "-mr-32 left-32" : "-mr-8 left-8"
+              }  `}
               style={{ zIndex: 5 - index }}
               key={game.slug}
             >
@@ -79,7 +88,7 @@ export const ListGames = ({
                 height={374}
                 width={264}
                 alt={game.name}
-                className={`rounded-sm-md h-full w-full object-cover `}
+                className={`rounded-sm-md h-full w-full object-cover heavy-shadow`}
               />
             </li>
           );
@@ -154,18 +163,26 @@ export const BacklogGames = ({ backlog }: { backlog: Game[] }) => {
 export const ListBlock = ({
   list,
   id,
+  big,
 }: {
   list: ListWithGames;
   id?: string;
+  big?: boolean;
 }) => {
+  big = big ? big : false;
   return (
     <div className="flex flex-col w-full py-2" id={id}>
       <Link href={`/list/${list.slug}`}>
-        <ListGames games={list.games} />
+        <ListGames big={big} games={list.games} />
       </Link>
       <div className="w-full">
         <Link href={`/list/${list.slug}`}>
-          <h2 className="font-semibold text-neutral-50"> {list.name} </h2>
+          <h2
+            className={`font-semibold text-neutral-50 ${big ? "text-lg" : ""}`}
+          >
+            {" "}
+            {list.name}{" "}
+          </h2>
         </Link>
         <span className="flex flex-row gap-2 place-items-center">
           <UserNameBadge user={list.author} />
@@ -183,6 +200,29 @@ export const ListBlock = ({
             </div>
           )}
         </span>
+      </div>
+    </div>
+  );
+};
+
+export const ListWithDescription = ({ list }: { list: ListWithGames }) => {
+  return (
+    <div key={list.slug} className="w-full flex flex-row py-4">
+      <Link key={list.slug} href={`/list/${list.slug}`} className="basis-1/3">
+        <ListGames className="max-h-full" games={list.games}></ListGames>
+      </Link>
+      <div className="px-4">
+        <Link key={list.slug} href={`/list/${list.slug}`} className="basis-1/3">
+          <h2 className="text-xl font-semibold text-neutral-50">
+            {" "}
+            {list.name}{" "}
+          </h2>
+        </Link>
+        <small className="text-discrete-grey/85 font-light">
+          {" "}
+          {`${list.games.length} games`}{" "}
+        </small>
+        <p> {list.description} </p>
       </div>
     </div>
   );

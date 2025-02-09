@@ -22,8 +22,15 @@ body {
 
 .profile-badge {
   border-radius: 50%;
-  border-width: 2px;
-  border-color: white;
+  outline: 1px solid rgba(255,255,255,0.4);
+  outline-offset: -1px;
+  transition: all ease-out 100ms;
+
+}
+
+.profile-badge:hover {
+  outline: 2px solid rgba(255,255,255,0.73);
+  outline-offset: -2px;
 }
 
 /* width */
@@ -164,7 +171,7 @@ body {
 }
 
 .smooth-transition {
-  transition: 0.2s cubic-bezier(0.76, 0, 0.24, 1);
+  transition: 150ms cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 .text-field {

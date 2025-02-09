@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Game, Prisma, Review } from "@prisma/client";
 import BoxArt from "@/components/boxartalt";
 import { ReviewCardUserPage } from "@/components/reviewcardalt";
-import { BacklogGames, ListGames } from "@/components/displaylist";
+import { BacklogGames, ListGames } from "@/components/lists/displaylist";
 import { FaCalendar } from "react-icons/fa6";
 import { RatingsChart } from "@/components/ratingschart";
 

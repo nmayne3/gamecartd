@@ -13,7 +13,7 @@ import { GetReleaseYear } from "@/igdb/helpers";
 import Backdrop from "@/components/backdrop";
 import { getSession } from "./api/auth/[...nextauth]/auth";
 import prisma from "@/lib/prisma";
-import { ListBlock } from "@/components/displaylist";
+import { ListBlock } from "@/components/lists/displaylist";
 import { ReviewCard } from "@/components/reviewcardalt";
 import ProfileBadge from "@/components/user/ProfileBadge";
 
@@ -72,7 +72,7 @@ export default async function Home() {
       <figure className="h-fit max-w-[1200px] bg-cover bg-top bg-no-repeat mask">
         <Backdrop bg={bg} name={bgGame.name}></Backdrop>
         <figcaption
-          className="absolute text-xs text-discrete-grey/50 font-light z-50 rotate-180 top-1/3 right-10 "
+          className="absolute text-xs text-discrete-grey/50 font-light z-50 rotate-180 top-1/3 right-10 smooth-transition hover:text-discrete-grey"
           style={{ writingMode: "vertical-rl" }}
         >
           {" "}
