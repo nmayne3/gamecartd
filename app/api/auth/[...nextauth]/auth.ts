@@ -48,7 +48,7 @@ export const options: AuthOptions = {
             id: user.id,
             slug: user.id,
             email: user.email,
-            name: user.name,
+            name: user.name ? user.name : "",
             image: user.image,
           },
         });
