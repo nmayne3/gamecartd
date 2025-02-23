@@ -1,11 +1,11 @@
-import React, { forwardRef } from "react";
+import React, { ForwardedRef, forwardRef } from "react";
 
 type Props = {
   children?: React.ReactNode;
   style?: { transform: string | undefined; transition: string | undefined };
 };
 
-export const DnDItem = forwardRef<HTMLDivElement, Props>(
+export const DnDItem = forwardRef(
   (
     {
       children,
@@ -15,7 +15,7 @@ export const DnDItem = forwardRef<HTMLDivElement, Props>(
       children?: React.ReactNode;
       style?: { transform: string | undefined; transition: string | undefined };
     },
-    ref
+    ref: ForwardedRef<HTMLDivElement>
   ) => {
     return (
       <div className="w-full h-full" style={style} {...props} ref={ref}>
