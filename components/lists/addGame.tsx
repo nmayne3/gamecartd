@@ -72,6 +72,7 @@ const AddGame = ({
           <Searchbar
             onClick={addGameToList}
             className="rounded-l-none h-full"
+            style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
           />
         </div>
         <button
@@ -96,7 +97,7 @@ const AddGame = ({
         {games.map((game, index) => {
           return (
             <li
-              key={index}
+              key={game.slug}
               className="flex flex-row p-3 h-20 place-content-between "
             >
               <div className="flex flex-row">

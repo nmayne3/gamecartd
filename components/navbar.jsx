@@ -100,6 +100,11 @@ const Navbar = () => {
                 {" "}
                 <hr className="border-menu-primary" />{" "}
               </li>
+              <li>
+                <Link className="dropdown-link" href={"/settings"}>
+                  Settings
+                </Link>
+              </li>
               <li className="dropdown">
                 <button
                   className=" dropdown-link w-full text-left"

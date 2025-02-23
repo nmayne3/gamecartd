@@ -2,6 +2,7 @@
 
 import {
   ChangeEvent,
+  CSSProperties,
   MouseEventHandler,
   useCallback,
   useEffect,
@@ -19,9 +20,11 @@ import { Input } from "../ui/input";
 const Searchbar = ({
   className,
   onClick,
+  style,
 }: {
   className?: string;
   onClick?: (game: string) => void;
+  style?: CSSProperties;
 }) => {
   const [inputElem, setInputElem] = useState("");
   const [resultingGames, setResultingGames] = useState(Array<Game>);
@@ -60,10 +63,7 @@ const Searchbar = ({
         id="search"
         placeholder="Enter name of game..."
         className={`w-full h-full pl-3 input-field peer ${className}`}
-        style={
-          // prevents rounded edges when used on list page
-          onClick ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } : {}
-        }
+        style={style}
       />
       {resultingGames.length > 0 && (
         <div className="absolute pt-1 hidden peer-focus-within:block hover:block drop-shadow-md max-w-72 z-10">

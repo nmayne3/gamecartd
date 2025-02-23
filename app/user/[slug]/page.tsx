@@ -8,8 +8,10 @@ import { Game, Prisma, Review } from "@prisma/client";
 import BoxArt from "@/components/boxartalt";
 import { ReviewCardUserPage } from "@/components/reviewcardalt";
 import { BacklogGames, ListGames } from "@/components/lists/displaylist";
-import { FaCalendar } from "react-icons/fa6";
+import { FaCalendar, FaGlobe, FaMapPin } from "react-icons/fa6";
 import { RatingsChart } from "@/components/ratingschart";
+import { URL } from "url";
+import Button from "@/components/button";
 
 type ReviewWithGame = Prisma.ReviewGetPayload<{
   include: { Game: true };
@@ -30,10 +32,14 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
       },
       backlog: true,
       ratings: true,
+      favoriteGames: { include: { game: true }, orderBy: { rank: "asc" } },
     },
   });
   console.log(user);
   if (!user) throw "Ahh no user!!";
+
+  const session = await getSession();
+  const isActiveUser = user.id == session?.user.id ? true : false;
   return (
     <main className="">
       <header id="Header Filler Block" className="w-full h-12 bg-primary" />
@@ -54,12 +60,43 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
                   alt="User Image"
                   width={128}
                   height={128}
+                  draggable={false}
                 ></Image>
               )}
-              <div className="flex flex-col">
-                <h1> {user.name} </h1>
-                <div> oh i am fun!</div>
-                <div> Links: yeehaw </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-row gap-6 items-center">
+                  <h1> {user.name} </h1>{" "}
+                  {isActiveUser && (
+                    <Link href={`/settings`} className="button shrink-0">
+                      {" "}
+                      Edit Profile{" "}
+                    </Link>
+                  )}
+                </div>
+                {user.bio && <p className="text-sm"> {user.bio} </p>}
+                <div className="flex flex-row gap-4 text-xs opacity-70 hover:opacity-100 smooth-transition ">
+                  {user.location && (
+                    <div className="flex flex-row gap-1 items-center">
+                      <FaMapPin />
+                      {user.location}
+                    </div>
+                  )}{" "}
+                  {user.website && (
+                    <Link
+                      className="flex flex-row items-center gap-1 smooth-transition *:fill-trimary *:smooth-transition  *:hover:fill-blue-400 hover:text-blue-400"
+                      // Append http:// to website if user did not
+                      href={`${URL.canParse(user.website) ? "" : "http://"}${
+                        user.website
+                      }`}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      {" "}
+                      <FaGlobe />
+                      {user.website}
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
             {/** Scorecard */}
@@ -94,7 +131,10 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
               className="basis-2/3 flex flex-col gap-6 flex-shrink-0 "
             >
               <Section header="Favorite Games" className="w-full">
-                <RowGames games={user.games} limit={4}></RowGames>
+                <RowGames
+                  games={user.favoriteGames.map((game) => game.game)}
+                  limit={4}
+                />
               </Section>
               <Section header="Recent Games">
                 <RowGames games={user.games} limit={4}></RowGames>
@@ -152,11 +192,11 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
               {user.backlog.length > 0 && (
                 <Section
                   header="Backlog"
-                  href={`/user/${user.id}/backlog/`}
+                  href={`/user/${user.slug}/backlog/`}
                   className="h-48"
                   more={user.backlog.length.toString()}
                 >
-                  <Link href={`/user/${user.id}/backlog/`}>
+                  <Link href={`/user/${user.slug}/backlog/`}>
                     <BacklogGames backlog={user.backlog} />
                   </Link>
                 </Section>
@@ -179,16 +219,17 @@ export default UserPage;
 const RowGames = ({ games, limit }: { games: Array<Game>; limit?: number }) => {
   if (!games) return;
   const size = limit || games.length < 7 ? "big" : "small";
+  const placeholderCount = 4 - games.length > 0 ? 4 - games.length : 0;
+  const placeholders = Array(placeholderCount).fill(undefined);
   return (
-    <div
-      className={`flex flex-row h-auto place-items-center gap-2 py-2 ${
-        limit && games.length >= limit ? "justify-between" : "justify-normal"
-      }`}
-    >
+    <div className={`grid grid-cols-4 gap-3 py-2`}>
       {games.slice(0, limit).map((game) => (
-        <Link href={`/game/${game.slug}`} key={game.slug} className="w-fit">
-          <BoxArt game={game} size={size} className="max-h-72 max-w-fit" />
+        <Link href={`/game/${game.slug}`} key={game.slug} className="">
+          <BoxArt game={game} size={size} className=" " />
         </Link>
+      ))}
+      {placeholders.map((entry, index) => (
+        <BoxArt key={`placeholder-${index}`} hoverEffect={false} />
       ))}
     </div>
   );
@@ -218,8 +259,6 @@ const Diary = ({ reviews }: { reviews: Array<ReviewWithGame> }) => {
         review.createdAt.getMonth() == sortedReviews.at(i)?.createdAt.getMonth()
       );
     });
-    //console.log("temp has been filtered");
-    //console.log(tempFiltered);
     i += tempFiltered.length - 1;
     postsByMonth.push(tempFiltered);
   }

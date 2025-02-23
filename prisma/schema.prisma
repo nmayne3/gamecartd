@@ -67,23 +67,29 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  slug          String    @unique
-  email         String    @unique
+  id            String         @id @default(cuid())
+  name          String
+  givenName     String?
+  lastName      String?
+  slug          String         @unique
+  email         String         @unique
   emailVerified DateTime?
   image         String?
+  bio           String?
+  website       String?
+  location      String?
+  favoriteGames FavoriteGame[]
   posts         Post[]
   accounts      Account[]
   sessions      Session[]
   reviews       Review[]
-  likedPosts    Review[]  @relation("LikedPosts")
+  likedPosts    Review[]       @relation("LikedPosts")
   lists         List[]
-  games         Game[]
-  likedGames    Game[]    @relation("LikedGames")
-  backlog       Game[]    @relation("BackloggedGames")
+  games         Game[]         @relation("PlayedGames")
+  likedGames    Game[]         @relation("LikedGames")
+  backlog       Game[]         @relation("BackloggedGames")
   ratings       Rating[]
-  likedLists    List[]    @relation("LikedLists")
+  likedLists    List[]         @relation("LikedLists")
 }
 
 model VerificationToken {
@@ -126,12 +132,24 @@ model Game {
   artworks           Artwork[]
   screenshots        Screenshots[]
   listItems          ListItem[]
-  users              User[]
+  users              User[]        @relation("PlayedGames")
   likedBy            User[]        @relation("LikedGames")
   backloggedBy       User[]        @relation("BackloggedGames")
   summary            String?
   platforms          Platform[]
   user_ratings       Rating[]
+
+  FavoriteGames FavoriteGame[]
+}
+
+model FavoriteGame {
+  game        Game   @relation(fields: [gameid], references: [id])
+  gameid      String
+  rank        String
+  favoritedBy User   @relation(fields: [userid], references: [id])
+  userid      String
+
+  @@id([userid, gameid])
 }
 
 model Artwork {
