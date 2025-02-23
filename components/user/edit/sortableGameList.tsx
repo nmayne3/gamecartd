@@ -24,7 +24,7 @@ import {
 import { SortableItem } from "../../ui/dnd-kit/sortableItem";
 import { Game } from "@prisma/client";
 import BoxArt from "../../boxartalt";
-import { Item } from "../../ui/dnd-kit/item";
+import { DnDItem } from "../../ui/dnd-kit/item";
 import FavoriteGameListing from "./favoriteGameListing";
 import { GetGameCombo } from "@/app/api/games/actions";
 
@@ -107,9 +107,9 @@ const SortableGameList = ({
       </SortableContext>
       <DragOverlay>
         {activeId ? (
-          <Item>
+          <DnDItem>
             <BoxArt game={activeGame} hoverEffect={false} />
-          </Item>
+          </DnDItem>
         ) : null}
       </DragOverlay>
     </DndContext>

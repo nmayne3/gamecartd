@@ -1,7 +1,7 @@
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Item } from "./item";
+import { DnDItem } from "./item";
 
 export function SortableItem({
   children,
@@ -19,8 +19,8 @@ export function SortableItem({
   };
 
   return (
-    <Item ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <DnDItem ref={setNodeRef} style={style} {...attributes} {...listeners}>
       {children}
-    </Item>
+    </DnDItem>
   );
 }

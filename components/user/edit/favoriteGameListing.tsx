@@ -19,7 +19,7 @@ type ListItem = {
  * @returns User Component for rendering list entry
  */
 
-const favoriteGameListing = ({
+const FavoriteGameListing = ({
   listing,
   isActive,
   games,
@@ -92,7 +92,7 @@ const favoriteGameListing = ({
   );
 };
 
-export default favoriteGameListing;
+export default FavoriteGameListing;
 
 const AddButton = ({
   onClick,

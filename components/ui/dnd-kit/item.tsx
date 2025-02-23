@@ -5,7 +5,7 @@ type Props = {
   style?: { transform: string | undefined; transition: string | undefined };
 };
 
-export const Item = forwardRef<HTMLDivElement, Props>(
+export const DnDItem = forwardRef<HTMLDivElement, Props>(
   (
     {
       children,

@@ -73,7 +73,9 @@ const UserPage = async ({ params }: { params: { slug: string } }) => {
                     </Link>
                   )}
                 </div>
-                {user.bio && <p className="text-sm"> {user.bio} </p>}
+                {user.bio && (
+                  <p className="text-sm whitespace-pre-wrap"> {user.bio} </p>
+                )}
                 <div className="flex flex-row gap-4 text-xs opacity-70 hover:opacity-100 smooth-transition ">
                   {user.location && (
                     <div className="flex flex-row gap-1 items-center">
