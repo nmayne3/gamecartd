@@ -22,7 +22,7 @@ const Backdrop = ({ bg, name }: { bg?: Picture; name?: string }) => {
           ref={ref}
           onLoad={() => setLoaded((loaded) => true)}
           draggable={false}
-          fetchPriority="high"
+          priority={true}
           loading="eager"
           style={{
             opacity: loaded ? 1 : 0,
