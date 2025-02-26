@@ -22,6 +22,8 @@ const Backdrop = ({ bg, name }: { bg?: Picture; name?: string }) => {
           ref={ref}
           onLoad={() => setLoaded((loaded) => true)}
           draggable={false}
+          fetchPriority="high"
+          loading="eager"
           style={{
             opacity: loaded ? 1 : 0,
             transition: "opacity 0.2s cubic-bezier(0.3, 0.2, 0.2, 0.8)",
