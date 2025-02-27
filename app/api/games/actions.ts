@@ -8,7 +8,7 @@ import { makeURLSafe } from "@/hooks/urlsafe";
 
 type GameWithReviewCount = Prisma.GameGetPayload<{
   include: {
-    developers: true;
+    developers: true | false;
     publishers: true;
     platforms: true;
     genres: true;
@@ -19,6 +19,18 @@ type GameWithReviewCount = Prisma.GameGetPayload<{
     GameMode: true;
   };
 }>;
+
+type Include = {
+  developers?: boolean;
+  publishers?: boolean;
+  platforms?: boolean;
+  genres?: boolean;
+  user_ratings?: boolean;
+  user_reviews?: boolean;
+  artworks?: boolean;
+  screenshots?: boolean;
+  GameMode?: boolean;
+};
 
 export async function AddToPlayed(slug: string) {
   const session = await getSession();
@@ -148,11 +160,6 @@ export async function RemoveFromBacklog(slug: string) {
   return result;
 }
 
-export async function GetGame(slug: string) {
-  const result = await prisma.game.findUnique({ where: { slug: slug } });
-  return result;
-}
-
 // Checks if a game's data is stale and needs to be refreshed
 function checkStale(updatedAt: Date) {
   const weekAgo = new Date();
@@ -160,40 +167,57 @@ function checkStale(updatedAt: Date) {
   return updatedAt < weekAgo;
 }
 
-/** Checks if game exists in db based off of slug, otherwise fetches game from igdb and adds game to db before returning */
-export async function GetGameCombo(
+export async function GetGame(
   slug: string,
-  full = true
-): Promise<GameWithReviewCount> {
-  const constructedInclude = full
-    ? {
-        developers: true,
-        publishers: true,
-        user_ratings: true,
-        user_reviews: { include: { _count: { select: { likedBy: true } } } },
-        artworks: true,
-        screenshots: true,
-      }
-    : {};
+  include: Include = {
+    developers: false,
+    publishers: false,
+    platforms: false,
+    genres: false,
+    user_ratings: false,
+    user_reviews: false,
+    artworks: false,
+    screenshots: false,
+    GameMode: false,
+  }
+) {
   const result = await prisma.game.findUnique({
     where: { slug: slug },
     include: {
-      developers: true,
-      publishers: true,
-      platforms: true,
-      genres: true,
-      user_ratings: true,
-      user_reviews: { include: { _count: { select: { likedBy: true } } } },
-      artworks: true,
-      screenshots: true,
-      GameMode: true,
+      developers: include.developers,
+      publishers: include.publishers,
+      platforms: include.platforms,
+      genres: include.genres,
+      user_ratings: include.user_ratings,
+      user_reviews: include.user_reviews
+        ? { include: { _count: { select: { likedBy: true } } } }
+        : false,
+      artworks: include.artworks,
+      screenshots: include.screenshots,
+      GameMode: include.GameMode,
     },
   });
-  if (!result) {
-    const game = await fetchGame(slug);
-    return AddGame(game);
-  } else if (result.updatedAt == null || checkStale(result.updatedAt)) {
-    return updateGame(result.slug);
+  return result;
+}
+
+/** Checks if game exists in db based off of slug, otherwise fetches game from igdb and adds game to db before returning */
+export async function GetGameCombo(
+  slug: string,
+  include: Include = {
+    developers: false,
+    publishers: false,
+    platforms: false,
+    genres: false,
+    user_ratings: false,
+    user_reviews: false,
+    artworks: false,
+    screenshots: false,
+    GameMode: false,
+  }
+) {
+  const result = await GetGame(slug, include);
+  if (!result || result.updatedAt == null || checkStale(result.updatedAt)) {
+    return AddGame(slug);
   }
   return result;
 }
@@ -288,237 +312,26 @@ export async function CreateReview({
   return review;
 }
 
-// Adds game from IGDB to local db
-export async function AddGame(game: Game) {
-  const first_release_date = game.first_release_date
-    ? new Date(game.first_release_date * 1000)
-    : null;
-  const lead_developer = game.involved_companies[0];
-
-  console.log(`DATE: ${lead_developer.company.start_date}`);
-
-  const constructed_screenshots = game.screenshots
-    ? {
-        createMany: {
-          data: game.screenshots.map((image) => {
-            return {
-              width: image.width,
-              height: image.height,
-              image_id: image.image_id,
-              url: `https://images.igdb.com/igdb/image/upload/t_1080p/${image.image_id}.jpg`,
-            };
-          }),
-        },
-      }
-    : {};
-
-  const constructed_artworks = game.artworks
-    ? {
-        createMany: {
-          data: game.artworks.map((image) => {
-            return {
-              width: image.width,
-              height: image.height,
-              image_id: image.image_id,
-              url: `https://images.igdb.com/igdb/image/upload/t_1080p/${image.image_id}.jpg`,
-            };
-          }),
-        },
-      }
-    : {};
-
-  const newGame = await prisma.game.create({
-    data: {
-      name: game.name,
-      slug: game.slug,
-      first_release_date: first_release_date,
-      cover: game.cover.image_id,
-      tags: game.themes?.map((a) => a.name),
-      summary: game.summary,
-      genres: {
-        connectOrCreate: game.genres.map((genre) => {
-          return {
-            where: {
-              slug: genre.slug,
-            },
-            create: {
-              name: genre.name,
-              slug: genre.slug ? genre.slug : genre.name.toLowerCase(),
-            },
-          };
-        }),
-      },
-      developers: {
-        connectOrCreate: game.involved_companies
-          .filter((comapny) => comapny.developer)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
-      },
-      publishers: {
-        connectOrCreate: game.involved_companies
-          .filter((company) => company.publisher)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
-      },
-      supporting_devs: {
-        connectOrCreate: game.involved_companies
-          .filter((company) => company.supporting)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
-      },
-      platforms: {
-        connectOrCreate: game.platforms.map((platform) => {
-          return {
-            where: {
-              slug: platform.slug,
-            },
-            create: {
-              name: platform.name,
-              slug: platform.slug,
-              abbreviation: platform.abbreviation,
-              alternative_name: platform.alternative_name,
-              generation: platform.generation,
-              summary: platform.summary,
-              url: platform.url,
-              platformFamily: platform.platform_family
-                ? {
-                    connectOrCreate: {
-                      where: {
-                        slug: platform.platform_family.slug
-                          ? platform.platform_family.slug
-                          : platform.platform_family.name.toLowerCase(),
-                      },
-                      create: {
-                        name: platform.platform_family?.name,
-                        slug: platform.platform_family.slug
-                          ? platform.platform_family.slug
-                          : platform.platform_family.name.toLowerCase(),
-                      },
-                    },
-                  }
-                : {},
-              platformLogo: platform.platform_logo
-                ? {
-                    connectOrCreate: {
-                      where: {
-                        image_id: platform.platform_logo.image_id,
-                      },
-                      create: {
-                        image_id: platform.platform_logo.image_id,
-                        animated: platform.platform_logo.animated
-                          ? platform.platform_logo.animated
-                          : false,
-                        alpha_channel: platform.platform_logo.alpha_channel
-                          ? platform.platform_logo.alpha_channel
-                          : false,
-                        height: platform.platform_logo.height,
-                        width: platform.platform_logo.width,
-                        url: platform.platform_logo.url
-                          ? platform.platform_logo.url
-                          : "",
-                      },
-                    },
-                  }
-                : {},
-            },
-          };
-        }),
-      },
-      GameMode: {
-        connectOrCreate: game.game_modes.map((mode) => {
-          return {
-            where: { slug: mode.slug ? mode.slug : makeURLSafe(mode.name) },
-            create: {
-              name: mode.name,
-              slug: mode.slug ? mode.slug : makeURLSafe(mode.name),
-            },
-          };
-        }),
-      },
-      keywords: game.keywords
-        ? game.keywords.map((descriptor) => descriptor.name)
-        : [],
-      artworks: constructed_artworks,
-      screenshots: constructed_screenshots,
-      alternate_names: game.alternative_names
-        ? game.alternative_names.map((entry) => entry.name)
-        : [],
-    },
-    include: {
-      developers: true,
-      publishers: true,
-      genres: true,
-      platforms: true,
-      user_ratings: true,
-      user_reviews: { include: { _count: { select: { likedBy: true } } } },
-      artworks: true,
-      screenshots: true,
-      GameMode: true,
-    },
-  });
-  console.log("Created Game and Company listings");
-  console.log(newGame);
-  return newGame;
-}
-
 /**
- * Updates a game in our database with recent data from the IGDB
+ * Adds or updates a game in our database with recent data from the IGDB
  *
  * @param slug unique url-safe slug value of the game we are updating
  * @returns updated game value
  */
-export async function updateGame(slug: string) {
+export async function AddGame(
+  slug: string,
+  include: Include = {
+    developers: false,
+    publishers: false,
+    platforms: false,
+    genres: false,
+    user_ratings: false,
+    user_reviews: false,
+    artworks: false,
+    screenshots: false,
+    GameMode: false,
+  }
+) {
   const game = await fetchGame(slug);
   const first_release_date = game.first_release_date
     ? new Date(game.first_release_date * 1000)
@@ -559,11 +372,178 @@ export async function updateGame(slug: string) {
       }
     : {};
 
-  const updatedGame = await prisma.game.update({
+  const updatedGame = await prisma.game.upsert({
     where: {
       slug: game.slug,
     },
-    data: {
+    create: {
+      name: game.name,
+      slug: game.slug,
+      first_release_date: first_release_date,
+      cover: game.cover.image_id,
+      tags: game.themes?.map((a) => a.name),
+      summary: game.summary,
+      genres: {
+        connectOrCreate: game.genres.map((genre) => {
+          return {
+            where: {
+              slug: genre.slug,
+            },
+            create: {
+              name: genre.name,
+              slug: genre.slug ? genre.slug : genre.name.toLowerCase(),
+            },
+          };
+        }),
+      },
+      developers: {
+        connectOrCreate: game.involved_companies
+          .filter((comapny) => comapny.developer)
+          .map((involved_company) => {
+            return {
+              where: {
+                slug: involved_company.company.slug,
+              },
+              create: {
+                name: involved_company.company.name,
+                description: involved_company.company.description,
+                country: involved_company.company.country,
+                logo: involved_company.company.logo?.image_id
+                  ? involved_company.company.logo?.image_id
+                  : null,
+                founded: involved_company.company.start_date
+                  ? new Date(involved_company.company.start_date * 1000)
+                  : null,
+                slug: involved_company.company.slug,
+              },
+            };
+          }),
+      },
+      publishers: {
+        connectOrCreate: game.involved_companies
+          .filter((company) => company.publisher)
+          .map((involved_company) => {
+            return {
+              where: {
+                slug: involved_company.company.slug,
+              },
+              create: {
+                name: involved_company.company.name,
+                description: involved_company.company.description,
+                country: involved_company.company.country,
+                logo: involved_company.company.logo?.image_id
+                  ? involved_company.company.logo?.image_id
+                  : null,
+                founded: involved_company.company.start_date
+                  ? new Date(involved_company.company.start_date * 1000)
+                  : null,
+                slug: involved_company.company.slug,
+              },
+            };
+          }),
+      },
+      supporting_devs: {
+        connectOrCreate: game.involved_companies
+          .filter((company) => company.supporting)
+          .map((involved_company) => {
+            return {
+              where: {
+                slug: involved_company.company.slug,
+              },
+              create: {
+                name: involved_company.company.name,
+                description: involved_company.company.description,
+                country: involved_company.company.country,
+                logo: involved_company.company.logo?.image_id
+                  ? involved_company.company.logo?.image_id
+                  : null,
+                founded: involved_company.company.start_date
+                  ? new Date(involved_company.company.start_date * 1000)
+                  : null,
+                slug: involved_company.company.slug,
+              },
+            };
+          }),
+      },
+      platforms: {
+        connectOrCreate: game.platforms.map((platform) => {
+          return {
+            where: {
+              slug: platform.slug,
+            },
+            create: {
+              name: platform.name,
+              slug: platform.slug,
+              abbreviation: platform.abbreviation,
+              alternative_name: platform.alternative_name,
+              generation: platform.generation,
+              summary: platform.summary,
+              url: platform.url,
+              platformFamily: platform.platform_family
+                ? {
+                    connectOrCreate: {
+                      where: {
+                        slug: platform.platform_family.slug
+                          ? platform.platform_family.slug
+                          : platform.platform_family.name.toLowerCase(),
+                      },
+                      create: {
+                        name: platform.platform_family?.name,
+                        slug: platform.platform_family.slug
+                          ? platform.platform_family.slug
+                          : platform.platform_family.name.toLowerCase(),
+                      },
+                    },
+                  }
+                : {},
+              platformLogo: platform.platform_logo
+                ? {
+                    connectOrCreate: {
+                      where: {
+                        image_id: platform.platform_logo.image_id,
+                      },
+                      create: {
+                        image_id: platform.platform_logo.image_id,
+                        animated: platform.platform_logo.animated
+                          ? platform.platform_logo.animated
+                          : false,
+                        alpha_channel: platform.platform_logo.alpha_channel
+                          ? platform.platform_logo.alpha_channel
+                          : false,
+                        height: platform.platform_logo.height,
+                        width: platform.platform_logo.width,
+                        url: platform.platform_logo.url
+                          ? platform.platform_logo.url
+                          : "",
+                      },
+                    },
+                  }
+                : {},
+            },
+          };
+        }),
+      },
+      GameMode: {
+        connectOrCreate: game.game_modes.map((mode) => {
+          return {
+            where: { slug: mode.slug ? mode.slug : makeURLSafe(mode.name) },
+            create: {
+              name: mode.name,
+              slug: mode.slug ? mode.slug : makeURLSafe(mode.name),
+            },
+          };
+        }),
+      },
+      keywords: game.keywords
+        ? game.keywords.map((descriptor) => descriptor.name)
+        : [],
+      artworks: constructed_artworks,
+      screenshots: constructed_screenshots,
+      alternate_names: game.alternative_names
+        ? game.alternative_names.map((entry) => entry.name)
+        : [],
+    },
+    update: {
       name: game.name,
       first_release_date: first_release_date,
       cover: game.cover.image_id,
@@ -730,15 +710,17 @@ export async function updateGame(slug: string) {
         : [],
     },
     include: {
-      developers: true,
-      publishers: true,
-      genres: true,
-      platforms: true,
-      user_ratings: true,
-      user_reviews: { include: { _count: { select: { likedBy: true } } } },
-      artworks: true,
-      screenshots: true,
-      GameMode: true,
+      developers: include.developers,
+      publishers: include.publishers,
+      platforms: include.platforms,
+      genres: include.genres,
+      user_ratings: include.user_ratings,
+      user_reviews: include.user_reviews
+        ? { include: { _count: { select: { likedBy: true } } } }
+        : false,
+      artworks: include.artworks,
+      screenshots: include.screenshots,
+      GameMode: include.GameMode,
     },
   });
   console.log("Updated Game and Company listings");

@@ -3,6 +3,8 @@ import RowGames from "../rowgames";
 import { fetchGame } from "@/igdb/api";
 import { Skeleton } from "../ui/skeleton";
 
+// Components to be used on a specific game's page
+
 const SimilarGames = async ({ slug }: { slug: string }) => {
   const game = await fetchGame(slug);
   return (

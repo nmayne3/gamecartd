@@ -1,35 +1,22 @@
 import "@/app/styles/home.css";
 import BoxArt from "@/components/boxartalt";
-import { Game, Picture, Descriptor, Company } from "@/igdb/interfaces";
-import { getAccessToken } from "@/igdb/auth";
 import { InfoTabs } from "@/components/infotabs";
 import { Section } from "@/components/section";
-import RowGames from "@/components/rowgames";
-import PlayedButton, {
-  BacklogButton,
-  LikeButton,
-} from "@/components/playedbutton";
-import { CheckPlayed, GetGameCombo } from "@/app/api/games/actions";
-import {
-  FaEye,
-  FaHeart,
-  FaBoxesStacked,
-  FaRegCalendarPlus,
-  FaStar,
-} from "react-icons/fa6";
+import { GetGameCombo } from "@/app/api/games/actions";
+import { FaEye, FaHeart, FaBoxesStacked } from "react-icons/fa6";
 import Backdrop from "@/components/backdrop";
 import type { Metadata } from "next";
-import { getSession } from "@/app/api/auth/[...nextauth]/auth";
-import prisma from "@/lib/prisma";
-import { cache, Suspense } from "react";
+import { Suspense } from "react";
 import { SpinnerIcon } from "@/components/icons";
-import ReviewWindow from "@/components/reviewwindow";
-import { ReviewCardGamePage } from "@/components/reviewcardalt";
-import { AddGame } from "@/app/api/games/actions";
-import { StarRating } from "@/components/reviewwindow";
-import { Artwork, Prisma, Screenshots } from "@prisma/client";
+import { Artwork, Screenshots } from "@prisma/client";
 import SimilarGames from "@/components/game/similarGames";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  PopularReviews,
+  RecentReviews,
+} from "@/components/game/reviewSections";
+import { InteractionPanel } from "@/components/game/interactionPanel";
+import InteractionPanelWrapper from "@/components/interactionpanel";
+import InfoTabsWrapper from "@/components/game/infoTabsWrapper";
 
 export async function generateMetadata({
   params,
@@ -39,7 +26,11 @@ export async function generateMetadata({
   // read route params
 
   const id = params.id;
-  const game = await GetGameCombo(id);
+  const game = await GetGameCombo(id, {
+    artworks: true,
+    screenshots: true,
+    developers: true,
+  });
   const first_release_date = game.first_release_date;
 
   return {
@@ -51,35 +42,16 @@ export async function generateMetadata({
 const GamePage = async ({ params }: { params: { id: string } }) => {
   const id = params.id;
   console.log(id);
-  const game = await GetGameCombo(id, true);
+  const game = await GetGameCombo(id, {
+    artworks: true,
+    screenshots: true,
+    developers: true,
+  });
   const bg = GetBackgroundImage(game);
   const first_release_date = game.first_release_date;
   const developer_name = game.developers.length
     ? game.developers[0].name
     : null;
-  const session = await getSession();
-  const [played, liked, backlogged] = session?.user.id
-    ? await CheckPlayed(id, session?.user.id)
-    : [false];
-
-  const reviews = game.user_reviews;
-
-  const rating = session?.user.id
-    ? await prisma.rating.findUnique({
-        where: { userId_gameId: { userId: session?.user.id, gameId: game.id } },
-      })
-    : null;
-
-  // Sorts reviews by date
-  reviews.sort((a, b) => {
-    if (a.createdAt < b.createdAt) {
-      return 1;
-    } else if (a.createdAt > b.createdAt) {
-      return -1;
-    } else {
-      return 0;
-    }
-  });
 
   return (
     <main className="flex min-h-screen flex-col max-w-screen-xl m-auto items-center gap-8">
@@ -88,13 +60,13 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
         id="Backdrop Image Container"
         className="h-fit max-w-[1200px] aspect-video bg-cover bg-top bg-no-repeat mask"
       >
-        {bg && <Backdrop bg={bg} name={game.name} />}
+        <Backdrop bg={bg} name={game.name} />
       </section>
       {/** Content */}
       <div className="md:flex md:flex-row max-w-3xl lg:max-w-screen-lg -mt-48 mx-auto place-items-start gap-8 h-fit p-4 lg:p-0 lg:pb-4 pb-4 z-10">
         {/** Boxart LEFT SIDE */}
         <figure className="hidden md:flex flex-col basis-1/4 flex-shrink-0 h-fit md:sticky md:top-4">
-          <BoxArt game={game} />
+          <BoxArt game={game} hoverEffect={false} />
           <span className="flex flex-row self-center text-xs items-center justify-center gap-2 p-2">
             <FaEye className="fill-accent-green" />
             {"427k"}
@@ -138,7 +110,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
               </h2>
             </header>
             <figure className="md:hidden basis-1/4">
-              <BoxArt game={game} />
+              <BoxArt game={game} hoverEffect={false} />
             </figure>
           </div>
           {/** Description Section */}
@@ -158,55 +130,22 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
                 </div>
                 {game.summary && <p className=""> {game.summary} </p>}
               </section>
-              <InfoTabs game={game} />
+              <Suspense fallback={<SpinnerIcon />}>
+                <InfoTabsWrapper slug={id} />
+              </Suspense>
             </div>
             {/** Right Side Column */}
             <aside className="basis-1/3">
-              {!session && (
-                <section id="Logged out Review Buttons">
-                  <h4 className="flex w-full bg-secondary rounded-t-sm-md justify-center outline outline-0.5 outline-primary p-2">
+              <Suspense
+                fallback={
+                  <InteractionPanelWrapper className="p-2">
                     {" "}
-                    Sign in to log, rate or review{" "}
-                  </h4>
-                  <h4 className="flex w-full bg-secondary rounded-b-sm-md justify-center outline outline-0.5 outline-primary p-2">
-                    Share
-                  </h4>
-                </section>
-              )}
-              {session && (
-                <section
-                  id="Review/Interaction Table"
-                  className="flex flex-col bg-secondary rounded-sm place-content-center w-full divide-y-1 divide-primary text-sm"
-                >
-                  <div className="grid grid-cols-3 w-full p-2">
-                    <PlayedButton game={game} initialState={played} />
-
-                    <LikeButton game={game} initialState={liked} />
-                    <BacklogButton game={game} initialState={backlogged} />
-                  </div>
-                  <div className="place-items-center place-content-center w-full text-center p-2">
-                    {"Rate"}
-                    <div className="flex flex-row gap-1 w-full place-content-center">
-                      {" "}
-                      <StarRating
-                        game={game}
-                        initialState={rating ? true : false}
-                        initialRating={rating ? rating.rating : 0}
-                      />{" "}
-                    </div>
-                  </div>
-                  <div className="place-items-center place-content-center w-full text-center p-2">
-                    <ReviewWindow
-                      game={game}
-                      rating={rating?.rating || 0}
-                      isRated={rating ? true : false}
-                    ></ReviewWindow>
-                  </div>
-                  <div className="place-items-center place-content-center w-full text-center p-2">
-                    {"Add to List"}
-                  </div>
-                </section>
-              )}
+                    Loading...{" "}
+                  </InteractionPanelWrapper>
+                }
+              >
+                <InteractionPanel game={game} />
+              </Suspense>
               <section
                 id="Quick Ratings"
                 className="flex w-full flex-row border-b border-secondary justify place-content-between uppercase items-baseline pt-4"
@@ -217,31 +156,16 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
             </aside>
           </div>
           {/** Review Section */}
-          {reviews.length > 0 && (
-            <Section header="Popular Reviews">
-              {reviews
-                .toSorted((a, b) => {
-                  if (a._count.likedBy < b._count.likedBy) {
-                    return 1;
-                  } else if (a._count.likedBy > b._count.likedBy) {
-                    return -1;
-                  } else {
-                    return 0;
-                  }
-                })
-                .slice(0, 2)
-                .map((review) => (
-                  <ReviewCardGamePage key={review.id} review={review} />
-                ))}
-            </Section>
-          )}
-          {reviews.length > 0 && (
-            <Section header="Recent Reviews">
-              {reviews.slice(0, 3).map((review) => {
-                return <ReviewCardGamePage key={review.id} review={review} />;
-              })}
-            </Section>
-          )}
+          <Suspense
+            fallback={<SpinnerIcon className="place-self-center m-auto" />}
+          >
+            <PopularReviews gameId={game.id} />
+          </Suspense>
+          <Suspense
+            fallback={<SpinnerIcon className="place-self-center m-auto" />}
+          >
+            <RecentReviews gameId={game.id} />
+          </Suspense>
 
           <Section header="Similar Games">
             <Suspense fallback={<SpinnerIcon />}>
@@ -255,40 +179,6 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
 };
 
 export default GamePage;
-
-const GetGame3P = cache(async (id: string): Promise<Game> => {
-  const access_token = getAccessToken();
-
-  if (
-    process.env.client_id === undefined ||
-    process.env.client_secret === undefined
-  ) {
-    throw new Error("Invalid env vars");
-  }
-
-  console.log(
-    `No slug city\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${access_token}`
-  );
-  const response = await fetch("https://api.igdb.com/v4/games", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Client-ID": process.env.client_id,
-      Authorization: "Bearer " + access_token,
-    },
-    body: `fields *, similar_games.cover.*, similar_games.name, similar_games.slug, platforms.*, platforms.platform_logo.*, platforms.platform_family.*, game_localizations.name, game_localizations.region.name, alternative_names.name, game_modes.name, keywords.name, themes.name, cover.*, artworks.*, screenshots.*, genres.*, involved_companies.*, involved_companies.company.*, involved_companies.company.logo.*; where slug = "${id}"; limit 1;`,
-  });
-  console.log(response.status);
-  // Authorization Error
-  if (response.status == 401 || response.status == 400) {
-    // Refresh token
-    console.log(await response.json());
-    throw new Error("AHHH SLUGS");
-  }
-  const game = await response.json();
-  console.log(game);
-  return await game[0];
-});
 
 const GetBackgroundImage = (game: {
   id: string;
@@ -306,26 +196,5 @@ const GetBackgroundImage = (game: {
     return game.artworks[0];
   } else if (game.cover)
     return { image_id: game.cover, height: 1080, width: 1920 };
-  return null;
+  return undefined;
 };
-
-const GetGame = cache(async (id: string) => {
-  const getGame = await prisma.game.findUnique({
-    where: {
-      slug: id,
-    },
-    include: {
-      developers: true,
-      user_ratings: true,
-      user_reviews: { include: { _count: { select: { likedBy: true } } } },
-      artworks: true,
-      screenshots: true,
-    },
-  });
-  if (!getGame) {
-    const game = await GetGame3P(id);
-    const newGame = await AddGame(game);
-    return newGame;
-  }
-  return getGame;
-});

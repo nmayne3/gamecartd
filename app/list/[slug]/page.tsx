@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import BoxArt from "@/components/boxartalt";
 import Backdrop from "@/components/backdrop";
-import InteractionPanel from "@/components/interactionpanel";
+import InteractionPanelWrapper from "@/components/interactionpanel";
 import { ListLikeButton } from "@/components/lists/likeList";
 import { getSession } from "@/app/api/auth/[...nextauth]/auth";
 
@@ -84,7 +84,7 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
             <div></div>
           </div>
         </div>
-        <InteractionPanel>
+        <InteractionPanelWrapper>
           {}{" "}
           <ListLikeButton list={list} initialState={list.likedBy.length > 0} />
           {author.email == email && (
@@ -94,7 +94,7 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
             </Link>
           )}
           <div>Share</div>
-        </InteractionPanel>
+        </InteractionPanelWrapper>
       </div>
     </main>
   );

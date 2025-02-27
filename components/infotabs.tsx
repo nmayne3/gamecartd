@@ -14,18 +14,25 @@ import {
 // TODO: Change from Game interface to prisma Game
 type GameWithEverything = Prisma.GameGetPayload<{
   include: {
-    developers: true;
-    publishers: true;
-    platforms: true;
-    genres: true;
-    user_ratings: true;
-    user_reviews: { include: { _count: { select: { likedBy: true } } } };
-    artworks: true;
-    screenshots: true;
-    GameMode: true;
+    developers: true | false;
+    publishers: true | false;
+    platforms: true | false;
+    genres: true | false;
+    user_ratings: true | false;
+    user_reviews:
+      | { include: { _count: { select: { likedBy: true } } } }
+      | false;
+    artworks: true | false;
+    screenshots: true | false;
+    GameMode: true | false;
   };
 }>;
 
+/**
+ *
+ * @param param0 Game with the following includes: @var platforms @var GameMode @var genres @var developers @var publishers
+ * @returns
+ */
 export const InfoTabs = ({ game }: { game: GameWithEverything }) => {
   return (
     <Tabs
