@@ -39,7 +39,7 @@ export async function generateMetadata({
   // read route params
 
   const id = params.id;
-  const game = await GetGame(id);
+  const game = await GetGameCombo(id);
   const first_release_date = game.first_release_date;
 
   return {
@@ -52,7 +52,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
   const id = params.id;
   console.log(id);
   const game = await GetGameCombo(id, true);
-  const bg = await GetBackgroundImage(game);
+  const bg = GetBackgroundImage(game);
   const first_release_date = game.first_release_date;
   const developer_name = game.developers.length
     ? game.developers[0].name
@@ -290,7 +290,7 @@ const GetGame3P = cache(async (id: string): Promise<Game> => {
   return await game[0];
 });
 
-const GetBackgroundImage = async (game: {
+const GetBackgroundImage = (game: {
   id: string;
   name: string;
   slug: string;
@@ -299,7 +299,7 @@ const GetBackgroundImage = async (game: {
   tags: string[];
   screenshots: Screenshots[];
   artworks: Artwork[];
-}): Promise<Picture | null> => {
+}) => {
   if (game.screenshots.length) {
     return game.screenshots[0];
   } else if (game.artworks.length) {
