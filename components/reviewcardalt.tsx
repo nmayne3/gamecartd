@@ -224,7 +224,10 @@ export const ReviewCard = async ({
   const initialLikeCount = review._count.likedBy;
   const initialLikedState = user ? user.likedPosts.includes(review) : false;
   return (
-    <section id="Review Card" className="flex flex-row py-4">
+    <section
+      id="Review Card"
+      className="flex flex-row py-4 min-h-fit h-40 justify-self-center"
+    >
       {/** Profile Image / Left */}
       <Link
         href={`/game/${review.Game.slug}`}

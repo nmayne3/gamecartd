@@ -25,14 +25,14 @@ export default PopularUsers;
 
 export const PlaceholderUser = () => {
   return (
-    <div className="flex flex-col divide-y-1 ">
+    <div className="flex flex-col divide-y-1">
       <div className="flex flex-row gap-1 place-items-center border-b-1 border-dark-grey py-2">
         <Skeleton className="h-9 w-9 rounded-full" />
-        <div className="px-1 flex flex-col gap-2 py-1">
+        <div className="px-1 flex flex-col gap-2">
           <Skeleton className="w-24 h-5 " />
           <span className="flex flex-row gap-1 place-items-baseline text-xs text-menu-primary">
-            <Skeleton className="w-16 h-3" />
-            <Skeleton className="w-14 h-3" />
+            <Skeleton className="w-16 h-4" />
+            <Skeleton className="w-14 h-4" />
           </span>
         </div>
       </div>

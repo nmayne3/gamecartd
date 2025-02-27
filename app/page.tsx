@@ -83,23 +83,29 @@ export default async function Home() {
           </div>
         )}
 
-        <div className="flex flex-row gap-8 h-fit w-fit">
+        <div className="flex flex-row gap-8 h-full w-5/6 place-content-center">
           <RowGames games={FeaturedGames} />
         </div>
-        <div className="flex flex-row gap-16">
+        <div className="flex flex-row gap-16 w-full">
           {/** Left Side */}
-          <Section header={"Popular Reviews this week"} className="basis-3/4">
+          <Section
+            header={"Popular Reviews this week"}
+            className="w-full basis-3/4"
+          >
             <Suspense fallback={<PlaceholderReviews />}>
               <PopularReviews />
             </Suspense>
           </Section>
           {/** Right side */}
-          <div className="basis-1/4">
+          <div className="basis-1/4 w-full h-full">
             <SectionHeader title="Popular Lists" className="divide-y-0" />{" "}
             <Suspense fallback={<PlaceholderListsAside />}>
               <PopularLists />
             </Suspense>
-            <Section header="Popular Reviewers" className="basis-1/4 py-12">
+            <Section
+              header="Popular Reviewers"
+              className="basis-1/4 w-full py-12"
+            >
               <Suspense fallback={<PlaceholderUser />}>
                 <PopularUsers />
               </Suspense>

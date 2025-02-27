@@ -7,6 +7,8 @@ import UserNameBadge from "../user/userNameBadge";
 import { FaHeart } from "react-icons/fa6";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
+import { Suspense, useState } from "react";
+import BoxArt from "../boxartalt";
 
 type ListWithGames = Prisma.ListGetPayload<{
   include: {
@@ -41,6 +43,8 @@ export const ListGames = ({
   className?: string;
   big?: boolean;
 }) => {
+  const [loaded, setLoaded] = useState(false);
+
   // set default to false
   big = big ? big : false;
 
@@ -50,7 +54,9 @@ export const ListGames = ({
       <li
         key={`placeholder-${i}`}
         id="list placeholder"
-        className="w-fit h-full shadow-2xl bg-zinc-900"
+        className={`w-full h-full shadow-2xl bg-zinc-900 ${
+          big == true ? "min-w-[calc(100%+8rem)]" : "min-w-[calc(100%+2rem)]"
+        }`}
         style={{ aspectRatio: 81.06 / 108.09, zIndex: 5 - games.length - i }}
       >
         <div
@@ -63,12 +69,14 @@ export const ListGames = ({
     );
   }
   return (
-    <div className="relative bg-zinc-900">
+    <div className="relative bg-zinc-900 w-full h-full">
       <ul
         id="List Images"
         style={{}}
-        className={`grid grid-cols-5  justify-between rounded-sm-md shadow-xl ${
-          big == true ? "mr-32" : "mr-8"
+        className={`grid grid-cols-5 justify-between h-full w-full rounded-sm-md shadow-xl ${
+          big == true
+            ? "mr-32 max-w-[calc(100%-8rem)]"
+            : "mr-8 max-w-[calc(100%-2rem)]"
         } relative`}
       >
         {games.slice(0, 5).map((entry, index) => {
@@ -76,21 +84,33 @@ export const ListGames = ({
           const game = entry.game;
           return (
             <li
-              className={` w-fit ${
+              className={`rounded-sm-md outline outline-0.5 outline-dark-grey bg-zinc-900  ${
+                big == true
+                  ? "min-w-[calc(100%+8rem)]"
+                  : "min-w-[calc(100%+2rem)]"
+              } w-fit h-full ${
                 big == true ? "-mr-32 left-32" : "-mr-8 left-8"
               }  `}
               style={{ zIndex: 5 - index }}
               key={game.slug}
             >
-              <Image
-                src={`https://images.igdb.com/igdb/image/upload/t_cover_${"big_2x"}/${
-                  game.cover
-                }.jpg`}
-                height={374}
-                width={264}
-                alt={game.name}
-                className={`rounded-sm-md h-full w-full object-cover heavy-shadow`}
-              />
+              <Suspense fallback={<BoxArt />}>
+                <Image
+                  src={`https://images.igdb.com/igdb/image/upload/t_cover_${"big_2x"}/${
+                    game.cover
+                  }.jpg`}
+                  height={374}
+                  width={264}
+                  alt={game.name}
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+                  className={`w-full h-full object-cover heavy-shadow`}
+                  onLoad={(e) => setLoaded(true)}
+                  style={{
+                    opacity: loaded ? 1 : 0,
+                    transition: "opacity 0.2s cubic-bezier(0.3, 0.2, 0.2, 0.8)",
+                  }}
+                />
+              </Suspense>
             </li>
           );
         })}
@@ -99,7 +119,7 @@ export const ListGames = ({
       <div
         id="Outline"
         style={{ zIndex: 10 }}
-        className="smooth-transition outline outline-0.5 outline-dark-grey rounded-sm-md hover:-outline-offset-2 hover:outline-2 hover:outline-accent-green absolute top-0 bottom-0 w-full"
+        className="smooth-transition outline outline-0.5 outline-dark-grey rounded-sm-md hover:-outline-offset-2 hover:outline-2 hover:outline-accent-green absolute top-0 bottom-0 w-full h-full"
       />
     </div>
   );
@@ -172,11 +192,11 @@ export const ListBlock = ({
 }) => {
   big = big ? big : false;
   return (
-    <div className="flex flex-col w-full py-2" id={id}>
-      <Link href={`/list/${list.slug}`}>
+    <div className="flex flex-col w-full h-full py-2" id={id}>
+      <Link className="w-full h-full" href={`/list/${list.slug}`}>
         <ListGames big={big} games={list.games} />
       </Link>
-      <div className="w-full">
+      <div className="w-full h-full">
         <Link href={`/list/${list.slug}`}>
           <h2
             className={`font-semibold text-neutral-50 ${big ? "text-lg" : ""}`}
@@ -250,6 +270,19 @@ export const PlaceholderListsAside = () => {
       <PlaceholderList />
       <PlaceholderList />
       <PlaceholderList />
+    </div>
+  );
+};
+
+export const PlaceholderListWithDescription = () => {
+  return (
+    <div className="w-full flex flex-row py-4">
+      <Skeleton className="w-56 h-24" />
+      <div className="px-4 flex flex-col gap-1">
+        <Skeleton className="w-24 h-7" />
+        <Skeleton className="w-12 h-3" />
+        <Skeleton className="w-72 h-4" />
+      </div>
     </div>
   );
 };
