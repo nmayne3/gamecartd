@@ -6,6 +6,7 @@ import Image from "next/image";
 import UserNameBadge from "../user/userNameBadge";
 import { FaHeart } from "react-icons/fa6";
 import Link from "next/link";
+import { Skeleton } from "../ui/skeleton";
 
 type ListWithGames = Prisma.ListGetPayload<{
   include: {
@@ -224,6 +225,31 @@ export const ListWithDescription = ({ list }: { list: ListWithGames }) => {
         </small>
         <p> {list.description} </p>
       </div>
+    </div>
+  );
+};
+
+export const PlaceholderList = () => {
+  return (
+    <div className="flex flex-col w-full py-2 gap-1">
+      <Skeleton className="w-full h-24" />
+      <div className="w-full flex flex-col gap-1">
+        <Skeleton className="w-36 h-5 " />
+        <span className="flex flex-row gap-2 place-items-center w-full">
+          <Skeleton className="w-5 h-5 rounded-full" />
+          <Skeleton className="w-40 h-3" />
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export const PlaceholderListsAside = () => {
+  return (
+    <div className="w-full">
+      <PlaceholderList />
+      <PlaceholderList />
+      <PlaceholderList />
     </div>
   );
 };

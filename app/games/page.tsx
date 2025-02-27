@@ -8,6 +8,12 @@ import { ReviewCard } from "@/components/reviewcardalt";
 import ProfileBadge from "@/components/user/ProfileBadge";
 import { Input } from "@/components/ui/input";
 import Searchbar from "@/components/lists/searchgame";
+import PopularReviews, {
+  PlaceholderReviews,
+} from "@/components/games/popularReviews";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import PopularUsers, { PlaceholderUser } from "@/components/games/popularUsers";
 
 export const metadata: Metadata = {
   title: "Games • Gamecartd",
@@ -29,25 +35,6 @@ const GamesPage = async () => {
     filter: "first_release_date > 1704096000 & aggregated_rating_count >= 3",
     sort: "first_release_date desc",
     limit: 12,
-  });
-
-  const popularReviews = await prisma.review.findMany({
-    include: {
-      Game: true,
-      author: true,
-      _count: { select: { likedBy: true } },
-      likedBy: true,
-    },
-    orderBy: { likedBy: { _count: "desc" } },
-    take: 6,
-  });
-
-  const popularUsers = await prisma.user.findMany({
-    include: {
-      _count: { select: { games: true, reviews: true } },
-      reviews: true,
-    },
-    take: 6,
   });
 
   return (
@@ -78,16 +65,16 @@ const GamesPage = async () => {
           <div className="flex flex-row gap-16">
             {/** Left Side */}
             <Section header={"Popular Reviews this week"} className="basis-3/4">
-              {popularReviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
-              ))}
+              <Suspense fallback={<PlaceholderReviews />}>
+                <PopularReviews />
+              </Suspense>
             </Section>
             {/** Right side */}
             <div className="basis-1/4">
               <Section header="Popular Reviewers" className="basis-1/4">
-                {popularUsers.map((user) => (
-                  <ProfileBadge key={user.slug} user={user} />
-                ))}
+                <Suspense fallback={<PlaceholderUser />}>
+                  <PopularUsers />
+                </Suspense>
               </Section>
             </div>
           </div>

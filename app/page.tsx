@@ -13,9 +13,18 @@ import { GetReleaseYear } from "@/igdb/helpers";
 import Backdrop from "@/components/backdrop";
 import { getSession } from "./api/auth/[...nextauth]/auth";
 import prisma from "@/lib/prisma";
-import { ListBlock } from "@/components/lists/displaylist";
+import {
+  ListBlock,
+  PlaceholderListsAside,
+} from "@/components/lists/displaylist";
 import { ReviewCard } from "@/components/reviewcardalt";
 import ProfileBadge from "@/components/user/ProfileBadge";
+import { Suspense } from "react";
+import PopularUsers, { PlaceholderUser } from "@/components/games/popularUsers";
+import PopularReviews, {
+  PlaceholderReviews,
+} from "@/components/games/popularReviews";
+import PopularLists from "@/components/lists/popularLists";
 
 export default async function Home() {
   // Get games from IGDB to ensure they are always up to date
@@ -31,41 +40,7 @@ export default async function Home() {
 
   // Get user info
   const session = await getSession();
-  const user = session?.user.email
-    ? await prisma.user.findUnique({
-        where: { email: session.user.email },
-        include: { likedPosts: true },
-      })
-    : null;
 
-  const popularLists = await prisma.list.findMany({
-    include: {
-      author: true,
-      games: { include: { game: true } },
-      _count: { select: { likedBy: true } },
-    },
-    orderBy: { likedBy: { _count: "desc" } },
-    take: 3,
-  });
-
-  const popularReviews = await prisma.review.findMany({
-    include: {
-      Game: true,
-      author: true,
-      _count: { select: { likedBy: true } },
-      likedBy: true,
-    },
-    orderBy: { likedBy: { _count: "desc" } },
-    take: 6,
-  });
-
-  const popularUsers = await prisma.user.findMany({
-    include: {
-      _count: { select: { games: true, reviews: true } },
-      reviews: true,
-    },
-    take: 6,
-  });
   return (
     <main className="flex min-h-screen flex-col max-w-screen-2xl items-center gap-8 mx-auto">
       {/** Backdrop Image Container */}
@@ -114,20 +89,20 @@ export default async function Home() {
         <div className="flex flex-row gap-16">
           {/** Left Side */}
           <Section header={"Popular Reviews this week"} className="basis-3/4">
-            {popularReviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
+            <Suspense fallback={<PlaceholderReviews />}>
+              <PopularReviews />
+            </Suspense>
           </Section>
           {/** Right side */}
           <div className="basis-1/4">
             <SectionHeader title="Popular Lists" className="divide-y-0" />{" "}
-            {popularLists.map((list) => (
-              <ListBlock key={list.slug} id={list.slug} list={list} />
-            ))}{" "}
+            <Suspense fallback={<PlaceholderListsAside />}>
+              <PopularLists />
+            </Suspense>
             <Section header="Popular Reviewers" className="basis-1/4 py-12">
-              {popularUsers.map((user) => (
-                <ProfileBadge key={user.slug} user={user} />
-              ))}
+              <Suspense fallback={<PlaceholderUser />}>
+                <PopularUsers />
+              </Suspense>
             </Section>
           </div>
         </div>

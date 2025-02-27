@@ -13,6 +13,8 @@ import {
 } from "@/components//lists/displaylist";
 import Button from "@/components/button";
 import Link from "next/link";
+import PopularUsers, { PlaceholderUser } from "@/components/games/popularUsers";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Lists • Gamecartd",
@@ -39,14 +41,6 @@ const ListsPage = async () => {
     },
     orderBy: { updatedAt: "desc" },
     take: 10,
-  });
-
-  const popularUsers = await prisma.user.findMany({
-    include: {
-      _count: { select: { games: true, reviews: true } },
-      reviews: true,
-    },
-    take: 6,
   });
 
   return (
@@ -87,9 +81,9 @@ const ListsPage = async () => {
             {/** Right side */}
             <div className="basis-1/4">
               <Section header="Popular Reviewers" className="basis-1/4">
-                {popularUsers.map((user) => (
-                  <ProfileBadge key={user.slug} user={user} />
-                ))}
+                <Suspense fallback={<PlaceholderUser />}>
+                  <PopularUsers />
+                </Suspense>
               </Section>
             </div>
           </div>
