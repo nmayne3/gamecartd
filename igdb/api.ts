@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { getAccessToken } from "./auth";
 import { Game } from "@/igdb/interfaces";
 
@@ -144,7 +145,15 @@ export const fetchSearchResults = async (search: string) => {
   return games;
 };
 
-export const fetchGame = async (slug: string) => {
+/**
+ *
+ * This function fetches a game from the 3rd party database using the game's unique slug. It does NOT add the game to our local database.
+ *
+ * @param slug unique slug for game we are fetching
+ *
+ * @returns Game fetched from 3rd Party database
+ */
+export const fetchGame = cache(async (slug: string): Promise<Game> => {
   const access_token = getAccessToken();
 
   if (
@@ -177,4 +186,4 @@ export const fetchGame = async (slug: string) => {
   const game = await response.json();
   console.log(game);
   return await game[0];
-};
+});

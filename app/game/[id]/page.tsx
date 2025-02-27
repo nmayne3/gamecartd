@@ -27,7 +27,9 @@ import ReviewWindow from "@/components/reviewwindow";
 import { ReviewCardGamePage } from "@/components/reviewcardalt";
 import { AddGame } from "@/app/api/games/actions";
 import { StarRating } from "@/components/reviewwindow";
-import { Artwork, Screenshots } from "@prisma/client";
+import { Artwork, Prisma, Screenshots } from "@prisma/client";
+import SimilarGames from "@/components/game/similarGames";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export async function generateMetadata({
   params,
@@ -49,7 +51,7 @@ export async function generateMetadata({
 const GamePage = async ({ params }: { params: { id: string } }) => {
   const id = params.id;
   console.log(id);
-  const game = await GetGame(id);
+  const game = await GetGameCombo(id, true);
   const bg = await GetBackgroundImage(game);
   const first_release_date = game.first_release_date;
   const developer_name = game.developers.length
@@ -60,7 +62,6 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
     ? await CheckPlayed(id, session?.user.id)
     : [false];
 
-  const game3p = await GetGame3P(id);
   const reviews = game.user_reviews;
 
   const rating = session?.user.id
@@ -157,7 +158,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
                 </div>
                 {game.summary && <p className=""> {game.summary} </p>}
               </section>
-              <InfoTabs game={game3p} />
+              <InfoTabs game={game} />
             </div>
             {/** Right Side Column */}
             <aside className="basis-1/3">
@@ -178,10 +179,7 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
                   className="flex flex-col bg-secondary rounded-sm place-content-center w-full divide-y-1 divide-primary text-sm"
                 >
                   <div className="grid grid-cols-3 w-full p-2">
-                    <PlayedButton
-                      game={game}
-                      initialState={played ? true : false}
-                    />
+                    <PlayedButton game={game} initialState={played} />
 
                     <LikeButton game={game} initialState={liked} />
                     <BacklogButton game={game} initialState={backlogged} />
@@ -240,18 +238,15 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
           {reviews.length > 0 && (
             <Section header="Recent Reviews">
               {reviews.slice(0, 3).map((review) => {
-                return (
-                  <ReviewCardGamePage
-                    key={review.id}
-                    review={review}
-                  ></ReviewCardGamePage>
-                );
+                return <ReviewCardGamePage key={review.id} review={review} />;
               })}
             </Section>
           )}
 
           <Section header="Similar Games">
-            <RowGames games={game3p.similar_games} limit={5}></RowGames>
+            <Suspense fallback={<SpinnerIcon />}>
+              <SimilarGames slug={id} />
+            </Suspense>
           </Section>
         </div>
       </div>

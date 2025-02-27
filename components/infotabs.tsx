@@ -2,8 +2,8 @@
 
 import React from "react";
 import { Tabs, Tab } from "@nextui-org/tabs";
+import { Game, Prisma } from "@prisma/client";
 import {
-  Game,
   Descriptor,
   Localizations,
   Company,
@@ -12,8 +12,21 @@ import {
 } from "@/igdb/interfaces";
 
 // TODO: Change from Game interface to prisma Game
+type GameWithEverything = Prisma.GameGetPayload<{
+  include: {
+    developers: true;
+    publishers: true;
+    platforms: true;
+    genres: true;
+    user_ratings: true;
+    user_reviews: { include: { _count: { select: { likedBy: true } } } };
+    artworks: true;
+    screenshots: true;
+    GameMode: true;
+  };
+}>;
 
-export const InfoTabs = ({ game }: { game: Game }) => {
+export const InfoTabs = ({ game }: { game: GameWithEverything }) => {
   return (
     <Tabs
       variant="underlined"
@@ -30,50 +43,47 @@ export const InfoTabs = ({ game }: { game: Game }) => {
     >
       <Tab key="details" title="Details">
         {/** Number of Players / Multiplayer Modes / Supported Languages / Game Modes / Series / Franchises */}
-        <DetailList sectionTitle="Platforms" descriptors={game.platforms} />
-        <DetailList sectionTitle="Game Modes" descriptors={game.game_modes} />
-        <RegionList
-          sectionTitle="Localizations"
-          localizations={game.game_localizations}
+        <DetailList
+          sectionTitle="Platforms"
+          descriptors={game.platforms.map((platform) => platform.name)}
         />
-        {game.alternative_names && (
+        <DetailList
+          sectionTitle="Game Modes"
+          descriptors={game.GameMode.map((mode) => mode.name)}
+        />
+        {game.alternate_names && (
           <DetailList
             sectionTitle="Alternate Titles"
-            descriptors={game.alternative_names
-              .concat(game.game_localizations)
-              .reverse()}
+            descriptors={game.alternate_names.reverse()}
           />
         )}
       </Tab>
       <Tab key="genres" title="Genres">
         <div className="flex flex-col">
           {" "}
-          <DetailList sectionTitle={"Genres"} descriptors={game.genres} />
-          <DetailList sectionTitle="Sub-Genres" descriptors={game.themes} />
+          <DetailList
+            sectionTitle={"Genres"}
+            descriptors={game.genres.map((genre) => genre.name)}
+          />
+          <DetailList sectionTitle="Sub-Genres" descriptors={game.tags} />
           <DetailList sectionTitle="Tags" descriptors={game.keywords} />
         </div>
       </Tab>
       <Tab key="teams" title="Teams">
-        <CompaniesTab companies={game.involved_companies} />
+        <div className="flex flex-col">
+          <DetailList
+            sectionTitle="Developers"
+            descriptors={game.developers.map((developer) => developer.name)}
+          />
+          <DetailList
+            sectionTitle="Publishers"
+            descriptors={game.developers.map((publisher) => publisher.name)}
+          />
+        </div>
       </Tab>
       <Tab key="releases" title="Releases" />
     </Tabs>
   );
-};
-
-const RegionList = ({
-  sectionTitle,
-  localizations,
-}: {
-  sectionTitle: string;
-  localizations: Array<Localizations>;
-}) => {
-  if (!localizations) return;
-  const descriptors = [];
-  for (const localization of localizations) {
-    descriptors.push(localization.region);
-  }
-  return DetailList({ sectionTitle, descriptors });
 };
 
 const DetailList = ({
@@ -81,7 +91,7 @@ const DetailList = ({
   descriptors,
 }: {
   sectionTitle: string;
-  descriptors: Array<Descriptor> | Array<Platform>;
+  descriptors: Array<string>;
 }) => {
   if (!descriptors || descriptors.length < 1) return;
   return (
@@ -97,64 +107,20 @@ const DetailList = ({
       <div className="basis-3/5 flex flex-row gap-1 flex-wrap capitalize">
         {" "}
         {descriptors.map(
-          (descriptor) =>
+          (descriptor, index) =>
             descriptor && (
               <div
-                key={descriptor.id ? descriptor.id : descriptor.name}
+                key={index}
                 className="bg-secondary/75 rounded-sm-md pt-[0.06rem] shadow-inner whitespace-nowrap overflow-hidden hover:brightness-125"
               >
                 <div className="p-1 bg-dark-grey rounded-sm-md">
                   {" "}
-                  {descriptor.name}{" "}
+                  {descriptor}{" "}
                 </div>
               </div>
             )
         )}{" "}
       </div>
-    </div>
-  );
-};
-
-const CompaniesTab = ({ companies }: { companies: Array<InvolvedCompany> }) => {
-  const developers = [];
-  const publishers = [];
-  const porters = [];
-  const supporting = [];
-
-  if (!companies) {
-    return;
-  }
-
-  for (const company of companies) {
-    if (company.porting) {
-      porters.push(company.company);
-    } else if (company.supporting) {
-      supporting.push(company.company);
-    } else if (company.developer) {
-      developers.push(company.company);
-    }
-    if (company.publisher) {
-      publishers.push(company.company);
-    }
-  }
-  return (
-    <div className="flex flex-col">
-      <DetailList
-        sectionTitle="Developers"
-        descriptors={developers}
-      ></DetailList>
-      <DetailList
-        sectionTitle="Publishers"
-        descriptors={publishers}
-      ></DetailList>
-      <DetailList
-        sectionTitle="Supporting Developers"
-        descriptors={supporting}
-      ></DetailList>
-      <DetailList
-        sectionTitle="Port Developers"
-        descriptors={porters}
-      ></DetailList>
     </div>
   );
 };

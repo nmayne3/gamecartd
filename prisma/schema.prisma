@@ -118,28 +118,40 @@ model Company {
 
 // TODO: Add themes and genres to game model
 model Game {
-  id                 String        @id @default(cuid())
+  id                 String         @id @default(cuid())
   name               String
-  slug               String        @unique
+  slug               String         @unique
   user_reviews       Review[]
   cover              String?
   first_release_date DateTime?
-  developers         Company[]     @relation("Developed")
-  publishers         Company[]     @relation("Published")
-  supporting_devs    Company[]     @relation("Supported")
+  developers         Company[]      @relation("Developed")
+  publishers         Company[]      @relation("Published")
+  supporting_devs    Company[]      @relation("Supported")
   genres             Genre[]
   tags               String[]
   artworks           Artwork[]
   screenshots        Screenshots[]
   listItems          ListItem[]
-  users              User[]        @relation("PlayedGames")
-  likedBy            User[]        @relation("LikedGames")
-  backloggedBy       User[]        @relation("BackloggedGames")
+  users              User[]         @relation("PlayedGames")
+  likedBy            User[]         @relation("LikedGames")
+  backloggedBy       User[]         @relation("BackloggedGames")
   summary            String?
   platforms          Platform[]
   user_ratings       Rating[]
+  alternate_names    String[]
+  keywords           String[]
+  FavoriteGames      FavoriteGame[]
+  GameMode           GameMode[]
+  updatedAt          DateTime?      @updatedAt
+}
 
-  FavoriteGames FavoriteGame[]
+model GameMode {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  games     Game[]
 }
 
 model FavoriteGame {
