@@ -16,7 +16,7 @@ export const PopularReviews = async ({ gameId }: { gameId: string }) => {
       {reviews.length > 0 && (
         <Section header="Popular Reviews">
           {reviews.map((review) => (
-            <Suspense fallback={<PlaceholderReviewGamePage />}>
+            <Suspense key={review.id} fallback={<PlaceholderReviewGamePage />}>
               <ReviewCardGamePage key={review.id} review={review} />
             </Suspense>
           ))}
@@ -37,7 +37,7 @@ export const RecentReviews = async ({ gameId }: { gameId: string }) => {
       {reviews.length > 0 && (
         <Section header="Popular Reviews">
           {reviews.map((review) => (
-            <Suspense fallback={<PlaceholderReviewGamePage />}>
+            <Suspense key={review.id} fallback={<PlaceholderReviewGamePage />}>
               <ReviewCardGamePage key={review.id} review={review} />
             </Suspense>
           ))}
