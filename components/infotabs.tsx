@@ -104,7 +104,7 @@ const DetailList = ({
   return (
     <div className="flex flex-row w-full gap-2 items-baseline baseline py-2 text-xs">
       {/** descriptor type */}
-      <div className="flex flex-row basis-2/5 gap-1 uppercase text-secondary max-w-full ">
+      <div className="flex flex-row basis-2/5 gap-1 uppercase text-menu-primary max-w-full ">
         {" "}
         <div className="flex-shrink-0">{sectionTitle}</div>
         <div className="w-full border-dotted border-0 border-secondary border-b mb-0.5">

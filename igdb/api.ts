@@ -163,9 +163,11 @@ export const fetchGame = cache(async (slug: string): Promise<Game> => {
     throw new Error("Invalid env vars");
   }
 
+  /*
   console.log(
     `No slug city\nClient-ID: ${process.env.client_id}\nAuthorization: Bearer ${access_token}`
   );
+  */
   const response = await fetch("https://api.igdb.com/v4/games", {
     method: "POST",
     headers: {
@@ -181,9 +183,9 @@ export const fetchGame = cache(async (slug: string): Promise<Game> => {
   if (response.status == 401 || response.status == 400) {
     // Refresh token
     console.log(await response.json());
-    throw new Error("AHHH SLUGS");
+    throw new Error("Authorization Error");
   }
   const game = await response.json();
-  console.log(game);
+  //  console.log(game);
   return await game[0];
 });

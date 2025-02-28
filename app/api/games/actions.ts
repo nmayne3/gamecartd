@@ -724,7 +724,7 @@ export async function AddGame(
     },
   });
   console.log("Updated Game and Company listings");
-  console.log(updatedGame);
+  //  console.log(updatedGame);
   return updatedGame;
 }
 
