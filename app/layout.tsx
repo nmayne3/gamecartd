@@ -35,7 +35,7 @@ export default async function RootLayout({
           <div className="h-12 z-50 absolute w-full">
             <Navbar />
           </div>
-          {await children}
+          {children}
           <SpeedInsights />
           <Toaster />
           <Footer />

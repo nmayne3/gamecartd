@@ -524,15 +524,17 @@ export async function AddGame(
         }),
       },
       GameMode: {
-        connectOrCreate: game.game_modes.map((mode) => {
-          return {
-            where: { slug: mode.slug ? mode.slug : makeURLSafe(mode.name) },
-            create: {
-              name: mode.name,
-              slug: mode.slug ? mode.slug : makeURLSafe(mode.name),
-            },
-          };
-        }),
+        connectOrCreate: game.game_modes
+          ? game.game_modes.map((mode) => {
+              return {
+                where: { slug: mode.slug ? mode.slug : makeURLSafe(mode.name) },
+                create: {
+                  name: mode.name,
+                  slug: mode.slug ? mode.slug : makeURLSafe(mode.name),
+                },
+              };
+            })
+          : [],
       },
       keywords: game.keywords
         ? game.keywords.map((descriptor) => descriptor.name)
@@ -690,15 +692,17 @@ export async function AddGame(
         }),
       },
       GameMode: {
-        connectOrCreate: game.game_modes.map((mode) => {
-          return {
-            where: { slug: mode.slug ? mode.slug : makeURLSafe(mode.name) },
-            create: {
-              name: mode.name,
-              slug: mode.slug ? mode.slug : makeURLSafe(mode.name),
-            },
-          };
-        }),
+        connectOrCreate: game.game_modes
+          ? game.game_modes.map((mode) => {
+              return {
+                where: { slug: mode.slug ? mode.slug : makeURLSafe(mode.name) },
+                create: {
+                  name: mode.name,
+                  slug: mode.slug ? mode.slug : makeURLSafe(mode.name),
+                },
+              };
+            })
+          : [],
       },
       keywords: game.keywords
         ? game.keywords.map((descriptor) => descriptor.name)
