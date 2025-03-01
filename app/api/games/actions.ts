@@ -336,9 +336,9 @@ export async function AddGame(
   const first_release_date = game.first_release_date
     ? new Date(game.first_release_date * 1000)
     : null;
-  const lead_developer = game.involved_companies[0];
+  //const lead_developer = game.involved_companies[0];
 
-  console.log(`DATE: ${lead_developer.company.start_date}`);
+  //console.log(`DATE: ${lead_developer.company.start_date}`);
 
   const constructed_screenshots = game.screenshots
     ? {
@@ -384,144 +384,154 @@ export async function AddGame(
       tags: game.themes?.map((a) => a.name),
       summary: game.summary,
       genres: {
-        connectOrCreate: game.genres.map((genre) => {
-          return {
-            where: {
-              slug: genre.slug,
-            },
-            create: {
-              name: genre.name,
-              slug: genre.slug ? genre.slug : genre.name.toLowerCase(),
-            },
-          };
-        }),
+        connectOrCreate: game.genres
+          ? game.genres.map((genre) => {
+              return {
+                where: {
+                  slug: genre.slug,
+                },
+                create: {
+                  name: genre.name,
+                  slug: genre.slug ? genre.slug : genre.name.toLowerCase(),
+                },
+              };
+            })
+          : [],
       },
       developers: {
         connectOrCreate: game.involved_companies
-          .filter((comapny) => comapny.developer)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
+          ? game.involved_companies
+              .filter((comapny) => comapny.developer)
+              .map((involved_company) => {
+                return {
+                  where: {
+                    slug: involved_company.company.slug,
+                  },
+                  create: {
+                    name: involved_company.company.name,
+                    description: involved_company.company.description,
+                    country: involved_company.company.country,
+                    logo: involved_company.company.logo?.image_id
+                      ? involved_company.company.logo?.image_id
+                      : null,
+                    founded: involved_company.company.start_date
+                      ? new Date(involved_company.company.start_date * 1000)
+                      : null,
+                    slug: involved_company.company.slug,
+                  },
+                };
+              })
+          : [],
       },
       publishers: {
         connectOrCreate: game.involved_companies
-          .filter((company) => company.publisher)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
+          ? game.involved_companies
+              .filter((company) => company.publisher)
+              .map((involved_company) => {
+                return {
+                  where: {
+                    slug: involved_company.company.slug,
+                  },
+                  create: {
+                    name: involved_company.company.name,
+                    description: involved_company.company.description,
+                    country: involved_company.company.country,
+                    logo: involved_company.company.logo?.image_id
+                      ? involved_company.company.logo?.image_id
+                      : null,
+                    founded: involved_company.company.start_date
+                      ? new Date(involved_company.company.start_date * 1000)
+                      : null,
+                    slug: involved_company.company.slug,
+                  },
+                };
+              })
+          : [],
       },
       supporting_devs: {
         connectOrCreate: game.involved_companies
-          .filter((company) => company.supporting)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
+          ? game.involved_companies
+              .filter((company) => company.supporting)
+              .map((involved_company) => {
+                return {
+                  where: {
+                    slug: involved_company.company.slug,
+                  },
+                  create: {
+                    name: involved_company.company.name,
+                    description: involved_company.company.description,
+                    country: involved_company.company.country,
+                    logo: involved_company.company.logo?.image_id
+                      ? involved_company.company.logo?.image_id
+                      : null,
+                    founded: involved_company.company.start_date
+                      ? new Date(involved_company.company.start_date * 1000)
+                      : null,
+                    slug: involved_company.company.slug,
+                  },
+                };
+              })
+          : [],
       },
       platforms: {
-        connectOrCreate: game.platforms.map((platform) => {
-          return {
-            where: {
-              slug: platform.slug,
-            },
-            create: {
-              name: platform.name,
-              slug: platform.slug,
-              abbreviation: platform.abbreviation,
-              alternative_name: platform.alternative_name,
-              generation: platform.generation,
-              summary: platform.summary,
-              url: platform.url,
-              platformFamily: platform.platform_family
-                ? {
-                    connectOrCreate: {
-                      where: {
-                        slug: platform.platform_family.slug
-                          ? platform.platform_family.slug
-                          : platform.platform_family.name.toLowerCase(),
-                      },
-                      create: {
-                        name: platform.platform_family?.name,
-                        slug: platform.platform_family.slug
-                          ? platform.platform_family.slug
-                          : platform.platform_family.name.toLowerCase(),
-                      },
-                    },
-                  }
-                : {},
-              platformLogo: platform.platform_logo
-                ? {
-                    connectOrCreate: {
-                      where: {
-                        image_id: platform.platform_logo.image_id,
-                      },
-                      create: {
-                        image_id: platform.platform_logo.image_id,
-                        animated: platform.platform_logo.animated
-                          ? platform.platform_logo.animated
-                          : false,
-                        alpha_channel: platform.platform_logo.alpha_channel
-                          ? platform.platform_logo.alpha_channel
-                          : false,
-                        height: platform.platform_logo.height,
-                        width: platform.platform_logo.width,
-                        url: platform.platform_logo.url
-                          ? platform.platform_logo.url
-                          : "",
-                      },
-                    },
-                  }
-                : {},
-            },
-          };
-        }),
+        connectOrCreate: game.platforms
+          ? game.platforms.map((platform) => {
+              return {
+                where: {
+                  slug: platform.slug,
+                },
+                create: {
+                  name: platform.name,
+                  slug: platform.slug,
+                  abbreviation: platform.abbreviation,
+                  alternative_name: platform.alternative_name,
+                  generation: platform.generation,
+                  summary: platform.summary,
+                  url: platform.url,
+                  platformFamily: platform.platform_family
+                    ? {
+                        connectOrCreate: {
+                          where: {
+                            slug: platform.platform_family.slug
+                              ? platform.platform_family.slug
+                              : platform.platform_family.name.toLowerCase(),
+                          },
+                          create: {
+                            name: platform.platform_family?.name,
+                            slug: platform.platform_family.slug
+                              ? platform.platform_family.slug
+                              : platform.platform_family.name.toLowerCase(),
+                          },
+                        },
+                      }
+                    : {},
+                  platformLogo: platform.platform_logo
+                    ? {
+                        connectOrCreate: {
+                          where: {
+                            image_id: platform.platform_logo.image_id,
+                          },
+                          create: {
+                            image_id: platform.platform_logo.image_id,
+                            animated: platform.platform_logo.animated
+                              ? platform.platform_logo.animated
+                              : false,
+                            alpha_channel: platform.platform_logo.alpha_channel
+                              ? platform.platform_logo.alpha_channel
+                              : false,
+                            height: platform.platform_logo.height,
+                            width: platform.platform_logo.width,
+                            url: platform.platform_logo.url
+                              ? platform.platform_logo.url
+                              : "",
+                          },
+                        },
+                      }
+                    : {},
+                },
+              };
+            })
+          : [],
       },
       GameMode: {
         connectOrCreate: game.game_modes
@@ -552,144 +562,154 @@ export async function AddGame(
       tags: game.themes?.map((a) => a.name),
       summary: game.summary,
       genres: {
-        connectOrCreate: game.genres.map((genre) => {
-          return {
-            where: {
-              slug: genre.slug,
-            },
-            create: {
-              name: genre.name,
-              slug: genre.slug ? genre.slug : genre.name.toLowerCase(),
-            },
-          };
-        }),
+        connectOrCreate: game.genres
+          ? game.genres.map((genre) => {
+              return {
+                where: {
+                  slug: genre.slug,
+                },
+                create: {
+                  name: genre.name,
+                  slug: genre.slug ? genre.slug : genre.name.toLowerCase(),
+                },
+              };
+            })
+          : [],
       },
       developers: {
         connectOrCreate: game.involved_companies
-          .filter((comapny) => comapny.developer)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
+          ? game.involved_companies
+              .filter((comapny) => comapny.developer)
+              .map((involved_company) => {
+                return {
+                  where: {
+                    slug: involved_company.company.slug,
+                  },
+                  create: {
+                    name: involved_company.company.name,
+                    description: involved_company.company.description,
+                    country: involved_company.company.country,
+                    logo: involved_company.company.logo?.image_id
+                      ? involved_company.company.logo?.image_id
+                      : null,
+                    founded: involved_company.company.start_date
+                      ? new Date(involved_company.company.start_date * 1000)
+                      : null,
+                    slug: involved_company.company.slug,
+                  },
+                };
+              })
+          : [],
       },
       publishers: {
         connectOrCreate: game.involved_companies
-          .filter((company) => company.publisher)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
+          ? game.involved_companies
+              .filter((company) => company.publisher)
+              .map((involved_company) => {
+                return {
+                  where: {
+                    slug: involved_company.company.slug,
+                  },
+                  create: {
+                    name: involved_company.company.name,
+                    description: involved_company.company.description,
+                    country: involved_company.company.country,
+                    logo: involved_company.company.logo?.image_id
+                      ? involved_company.company.logo?.image_id
+                      : null,
+                    founded: involved_company.company.start_date
+                      ? new Date(involved_company.company.start_date * 1000)
+                      : null,
+                    slug: involved_company.company.slug,
+                  },
+                };
+              })
+          : [],
       },
       supporting_devs: {
         connectOrCreate: game.involved_companies
-          .filter((company) => company.supporting)
-          .map((involved_company) => {
-            return {
-              where: {
-                slug: involved_company.company.slug,
-              },
-              create: {
-                name: involved_company.company.name,
-                description: involved_company.company.description,
-                country: involved_company.company.country,
-                logo: involved_company.company.logo?.image_id
-                  ? involved_company.company.logo?.image_id
-                  : null,
-                founded: involved_company.company.start_date
-                  ? new Date(involved_company.company.start_date * 1000)
-                  : null,
-                slug: involved_company.company.slug,
-              },
-            };
-          }),
+          ? game.involved_companies
+              .filter((company) => company.supporting)
+              .map((involved_company) => {
+                return {
+                  where: {
+                    slug: involved_company.company.slug,
+                  },
+                  create: {
+                    name: involved_company.company.name,
+                    description: involved_company.company.description,
+                    country: involved_company.company.country,
+                    logo: involved_company.company.logo?.image_id
+                      ? involved_company.company.logo?.image_id
+                      : null,
+                    founded: involved_company.company.start_date
+                      ? new Date(involved_company.company.start_date * 1000)
+                      : null,
+                    slug: involved_company.company.slug,
+                  },
+                };
+              })
+          : [],
       },
       platforms: {
-        connectOrCreate: game.platforms.map((platform) => {
-          return {
-            where: {
-              slug: platform.slug,
-            },
-            create: {
-              name: platform.name,
-              slug: platform.slug,
-              abbreviation: platform.abbreviation,
-              alternative_name: platform.alternative_name,
-              generation: platform.generation,
-              summary: platform.summary,
-              url: platform.url,
-              platformFamily: platform.platform_family
-                ? {
-                    connectOrCreate: {
-                      where: {
-                        slug: platform.platform_family.slug
-                          ? platform.platform_family.slug
-                          : platform.platform_family.name.toLowerCase(),
-                      },
-                      create: {
-                        name: platform.platform_family?.name,
-                        slug: platform.platform_family.slug
-                          ? platform.platform_family.slug
-                          : platform.platform_family.name.toLowerCase(),
-                      },
-                    },
-                  }
-                : {},
-              platformLogo: platform.platform_logo
-                ? {
-                    connectOrCreate: {
-                      where: {
-                        image_id: platform.platform_logo.image_id,
-                      },
-                      create: {
-                        image_id: platform.platform_logo.image_id,
-                        animated: platform.platform_logo.animated
-                          ? platform.platform_logo.animated
-                          : false,
-                        alpha_channel: platform.platform_logo.alpha_channel
-                          ? platform.platform_logo.alpha_channel
-                          : false,
-                        height: platform.platform_logo.height,
-                        width: platform.platform_logo.width,
-                        url: platform.platform_logo.url
-                          ? platform.platform_logo.url
-                          : "",
-                      },
-                    },
-                  }
-                : {},
-            },
-          };
-        }),
+        connectOrCreate: game.platforms
+          ? game.platforms.map((platform) => {
+              return {
+                where: {
+                  slug: platform.slug,
+                },
+                create: {
+                  name: platform.name,
+                  slug: platform.slug,
+                  abbreviation: platform.abbreviation,
+                  alternative_name: platform.alternative_name,
+                  generation: platform.generation,
+                  summary: platform.summary,
+                  url: platform.url,
+                  platformFamily: platform.platform_family
+                    ? {
+                        connectOrCreate: {
+                          where: {
+                            slug: platform.platform_family.slug
+                              ? platform.platform_family.slug
+                              : platform.platform_family.name.toLowerCase(),
+                          },
+                          create: {
+                            name: platform.platform_family?.name,
+                            slug: platform.platform_family.slug
+                              ? platform.platform_family.slug
+                              : platform.platform_family.name.toLowerCase(),
+                          },
+                        },
+                      }
+                    : {},
+                  platformLogo: platform.platform_logo
+                    ? {
+                        connectOrCreate: {
+                          where: {
+                            image_id: platform.platform_logo.image_id,
+                          },
+                          create: {
+                            image_id: platform.platform_logo.image_id,
+                            animated: platform.platform_logo.animated
+                              ? platform.platform_logo.animated
+                              : false,
+                            alpha_channel: platform.platform_logo.alpha_channel
+                              ? platform.platform_logo.alpha_channel
+                              : false,
+                            height: platform.platform_logo.height,
+                            width: platform.platform_logo.width,
+                            url: platform.platform_logo.url
+                              ? platform.platform_logo.url
+                              : "",
+                          },
+                        },
+                      }
+                    : {},
+                },
+              };
+            })
+          : [],
       },
       GameMode: {
         connectOrCreate: game.game_modes
