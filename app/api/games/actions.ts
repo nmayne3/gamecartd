@@ -380,7 +380,7 @@ export async function AddGame(
       name: game.name,
       slug: game.slug,
       first_release_date: first_release_date,
-      cover: game.cover.image_id,
+      cover: game.cover ? game.cover.image_id : undefined,
       tags: game.themes?.map((a) => a.name),
       summary: game.summary,
       genres: {
@@ -558,7 +558,7 @@ export async function AddGame(
     update: {
       name: game.name,
       first_release_date: first_release_date,
-      cover: game.cover.image_id,
+      cover: game.cover ? game.cover.image_id : undefined,
       tags: game.themes?.map((a) => a.name),
       summary: game.summary,
       genres: {

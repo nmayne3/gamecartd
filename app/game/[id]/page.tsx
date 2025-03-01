@@ -54,16 +54,16 @@ const GamePage = async ({ params }: { params: { id: string } }) => {
     : null;
 
   return (
-    <main className="flex min-h-screen flex-col max-w-screen-xl m-auto items-center gap-8">
+    <main className="flex min-h-screen flex-col m-auto w-full gap-8">
       {/** Backdrop Image Container */}
-      <section
-        id="Backdrop Image Container"
-        className="h-fit max-w-[1200px] aspect-video bg-cover bg-top bg-no-repeat mask"
-      >
-        <Backdrop bg={bg} name={game.name} />
-      </section>
+
+      <Backdrop bg={bg} name={game.name} />
       {/** Content */}
-      <div className="md:flex md:flex-row max-w-3xl lg:max-w-screen-lg -mt-48 mx-auto place-items-start gap-8 h-fit p-4 lg:p-0 lg:pb-4 pb-4 z-10">
+      <div
+        className={`w-full md:flex md:flex-row max-w-3xl lg:max-w-screen-lg ${
+          bg ? "-mt-48" : "mt-20"
+        }  mx-auto place-items-start justify-self-center gap-8 h-fit p-4 lg:p-0 lg:pb-4 pb-4 z-10`}
+      >
         {/** Boxart LEFT SIDE */}
         <figure className="hidden md:flex flex-col basis-1/4 flex-shrink-0 h-fit md:sticky md:top-4">
           <BoxArt game={game} hoverEffect={false} />

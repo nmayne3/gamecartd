@@ -11,14 +11,14 @@ const Backdrop = ({ bg, name }: { bg?: Picture; name?: string }) => {
   const isInView = useInView(ref, { amount: "all", once: true });
 
   return (
-    <div className="">
+    <div className={`${bg ? "mask mx-auto" : ""}`}>
       {bg && name && (
         <Image
           src={`https://images.igdb.com/igdb/image/upload/t_1080p/${bg.image_id}.jpg`}
           width={bg.width}
           height={bg.height}
           alt={name}
-          className="z-0 object-cover aspect-video w-[1200px]"
+          className="z-0 object-cover aspect-video w-[1200px] h-fit max-w-[1200px] bg-cover bg-top bg-no-repeat mask"
           ref={ref}
           onLoad={() => setLoaded((loaded) => true)}
           draggable={false}
