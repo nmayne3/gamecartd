@@ -1,55 +1,39 @@
-"use client";
-
 import Button from "@/components/button";
 import Image from "next/image";
 import HeroImage from "@/assets/ltp.jpg";
 import { signIn, useSession } from "next-auth/react";
+import { getCsrfToken } from "next-auth/react";
+import ProvidersSignIn from "@/components/auth/providersSignIn";
+import SignIn from "@/components/auth/credentialSignIn";
+import { Separator } from "@radix-ui/react-menubar";
+import { Card } from "@/components/ui/card";
 
 const Login = () => {
   return (
-    <div>
-      <header id="Header Filler Block" className="w-full h-12 bg-primary" />
+    <div className="min-h-[calc(100vh-8rem)] h-full">
+      <header
+        id="Header Filler Block"
+        className="w-full h-12 bg-primary drop-shadow-xl"
+      />
 
-      <div className="flex flex-row">
-        <Image src={HeroImage} alt="Hero Image" className="basis-1/2" />
-        <div className="mt-24 flex flex-col place-content-center place-items-center mx-auto p-8 gap-4">
-          <h1> Sign-In </h1>
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="font-semibold"> Username </h2>
-              <input
-                type="text"
-                className="text-field"
-                placeholder="example@email.com"
-              />
-            </div>
-            <div>
-              <h2 className="font-semibold"> Password </h2>
+      <div className="flex flex-row w-full min-h-[calc(100vh-8rem-3rem)] h-full">
+        <Image
+          priority={true}
+          src={HeroImage}
+          alt="Hero Image"
+          className="basis-1/2 object-cover"
+          draggable={false}
+        />
 
-              <input
-                type="password"
-                className="text-field"
-                placeholder="Password"
-              />
+        <div className=" basis-1/2 place-content-center background-pattern ">
+          <Card className="min-w-96  max-w-lg  flex flex-col place-content-center place-items-start m-auto p-24 gap-4 self-center">
+            <h1> Sign-In </h1>
+            <SignIn />
+            <div className="separator w-full ">
+              <span className="px-2 "> or </span>
             </div>
-          </div>
-          <Button className={""}> Login </Button>
-          <Button
-            onClick={() => {
-              signIn("github", { callbackUrl: "/" });
-            }}
-          >
-            {" "}
-            Sign-In with Github{" "}
-          </Button>
-          <Button
-            onClick={async () => {
-              await signIn("discord", { callbackUrl: "/" });
-            }}
-          >
-            {" "}
-            Sign-In with Discord{" "}
-          </Button>
+            <ProvidersSignIn />
+          </Card>
         </div>
       </div>
     </div>

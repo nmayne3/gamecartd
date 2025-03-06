@@ -15,6 +15,12 @@ const nextConfig = {
                 hostname: "cdn.discordapp.com",
                 port: '',
                 pathname: '/avatars/**'
+            }, 
+            {  
+                protocol: 'https',
+                hostname: "static.vecteezy.com",
+                port: '',
+                pathname: '/system/resources/thumbnails/**'
             },        
         ],
     },

@@ -54,8 +54,8 @@ const config: Config = {
           foreground: "var(--dropdown-foreground)",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "var(--card)",
+          foreground: "var(--card-foreground)",
         },
         popover: {
           DEFAULT: "var(--popover)",

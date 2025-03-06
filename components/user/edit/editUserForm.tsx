@@ -36,6 +36,10 @@ const EditUserForm = ({ user }: { user: UserWithFavorites }) => {
 
   const FormSchema = z.object({
     name: z.string().max(100, "Review must be no more than 100 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .optional(),
     givenName: z.string().optional(),
     lastName: z.string().optional(),
     slug: z.string(),
@@ -67,6 +71,7 @@ const EditUserForm = ({ user }: { user: UserWithFavorites }) => {
     const profile = await updateProfile(
       user.id,
       data.name,
+      data.password,
       data.givenName,
       data.lastName,
       data.slug,
@@ -103,6 +108,7 @@ const EditUserForm = ({ user }: { user: UserWithFavorites }) => {
               {...form.register("name")}
             />
           </label>
+
           <div className="flex flex-row place-content-between *:basis-1/2 gap-2">
             <label htmlFor="given name">
               {"Given name"}

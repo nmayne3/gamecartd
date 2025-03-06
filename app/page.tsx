@@ -25,6 +25,7 @@ import PopularReviews, {
   PlaceholderReviews,
 } from "@/components/games/popularReviews";
 import PopularLists from "@/components/lists/popularLists";
+import SignUpDialog from "@/components/auth/signUpDialog";
 
 export default async function Home() {
   // Get games from IGDB to ensure they are always up to date
@@ -67,12 +68,14 @@ export default async function Home() {
               <h1> {`Save those you want to try.`} </h1>
               <h1> {`Tell your friends what's good.`} </h1>
             </div>
-            <Link
-              href="/login"
-              className="flex rounded-md py-2 px-4 bg-accent-green hover:brightness-90"
-            >
-              <h1 className="font-bold">{`Get started - it's free!`}</h1>
-            </Link>
+            <SignUpDialog
+              trigger={
+                <div className="flex rounded-sm-md py-2 px-4 text-white font-semibold text-lg bg-accent-green hover:brightness-90">
+                  {`Get started - it's free!`}
+                </div>
+              }
+            />
+
             <div className="text-sm"> The social network for game lovers. </div>
           </div>
         )}
@@ -83,7 +86,7 @@ export default async function Home() {
           </div>
         )}
 
-        <div className="flex flex-row gap-8 h-full w-5/6 place-content-center">
+        <div className="flex flex-row gap-8 h-full w-full place-content-center">
           <RowGames games={FeaturedGames} />
         </div>
         <div className="flex flex-row gap-16 w-full">

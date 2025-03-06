@@ -209,7 +209,7 @@ body {
     --foreground: 0 0% 3.9%;
     --dropdown: #89a;
     --dropdown-foreground: #2c3440;
-    --card: 0 0% 100%;
+    --card: #456;
     --card-foreground: 0 0% 3.9%;
     --popover: #678;
     --popover-foreground: #d8e0e8;
@@ -400,7 +400,31 @@ label {
   filter: brightness(0.90);
 }
 
+.background-pattern {
+  background-image: url('https://s.ltrbxd.com/static/img/content-bg.4284ab72.png');
+  background-repeat: repeat-x;
+}
 
+.separator {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex
+;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0 4px;
+  content: var(--border);
+}
+
+.separator:before, .separator:after {
+  content: "";
+  width: 50%;
+  height: 1px;
+  background-color: var(--dropdown);
+}
 
 @layer base {
   * {

@@ -5,6 +5,10 @@ import GitHubProvider from "next-auth/providers/github";
 import DiscordProvider from "next-auth/providers/discord";
 import prisma from "@/lib/prisma";
 import { AuthOptions, getServerSession } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { v4 as uuid } from "uuid";
+import { encode } from "next-auth/jwt";
+import bcrypt from "bcrypt";
 
 if (
   process.env.GITHUB_ID === undefined ||
@@ -31,6 +35,44 @@ export const options: AuthOptions = {
       clientSecret: process.env.DISCORD_SECRET,
       allowDangerousEmailAccountLinking: true,
     }),
+    CredentialsProvider({
+      name: "Credentials",
+
+      credentials: {
+        email: {
+          label: "email",
+          type: "text",
+          placeholder: "gamelover@email.com",
+        },
+        password: { label: "password", type: "password" },
+      },
+
+      async authorize(credentials) {
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials?.email,
+          },
+        });
+        if (!user) {
+          // User not found, return null
+          console.log("ERROR: User not found");
+          return null;
+        }
+        if (user.password == null) {
+          // User has no assigned password, return null
+          console.log("Error: User has no set password");
+          return null;
+        }
+        if (credentials) {
+          if (await bcrypt.compare(credentials?.password, user.password)) {
+            // Passwords match, return user
+            console.log("user goated");
+            return user;
+          }
+        }
+        return null;
+      },
+    }),
   ],
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
@@ -40,8 +82,10 @@ export const options: AuthOptions = {
             id: user.id,
           },
         })
-      )
+      ) {
+        console.log("user found");
         return true;
+      }
       if (user.email) {
         await prisma.user.create({
           data: {
@@ -52,9 +96,20 @@ export const options: AuthOptions = {
             image: user.image,
           },
         });
-      }
+        console.log("user created");
 
-      return true;
+        return true;
+      }
+      if (credentials) {
+        console.log("We are calling back now");
+      }
+      return false;
+    },
+    async jwt({ token, user, account }) {
+      if (account?.provider === "credentials") {
+        token.credentials = true;
+      }
+      return token;
     },
     async session({ session }) {
       // Send properties to the client, like an access_token and user id from a provider.
@@ -71,6 +126,32 @@ export const options: AuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   secret: process.env.SECRET,
+  jwt: {
+    encode: async function (params) {
+      if (params.token?.credentials) {
+        const sessionToken = uuid();
+
+        if (!params.token.sub) {
+          throw new Error("No user ID found in token");
+        }
+
+        const createdSession = await prisma.session.create({
+          data: {
+            sessionToken: sessionToken,
+            userId: params.token.sub,
+            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          },
+        });
+
+        if (!createdSession) {
+          throw new Error("Failed to create session");
+        }
+
+        return sessionToken;
+      }
+      return encode(params);
+    },
+  },
 };
 
 export const getSession = () => getServerSession(options);

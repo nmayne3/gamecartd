@@ -10,6 +10,8 @@ import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { DropdownTab } from "./dropdown";
+import SignUpDialog from "./auth/signUpDialog";
+import SignInDialog from "./auth/signInDialog";
 
 const links = [
   { url: "/games", title: "Games" },
@@ -35,14 +37,11 @@ const Navbar = () => {
         {/* Website Directory */}
         <nav className="hidden md:flex flex-row items-center justify-center gap-4 header-text z-50 uppercase">
           {/** Login Section */}
+          {session.status != "authenticated" && <SignInDialog />}
           {session.status != "authenticated" && (
-            <Link href={"/login"} className="hover:text-white">
-              {" "}
-              Sign In{" "}
-            </Link>
-          )}
-          {session.status != "authenticated" && (
-            <div className="hover:text-white"> Create Account </div>
+            <SignUpDialog
+              trigger={<span className="header-text"> Create Account </span>}
+            />
           )}
           {/** Profile Section */}
           {session.status == "authenticated" && (
