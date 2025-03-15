@@ -31,7 +31,7 @@ const CommentClientSection = ({
         }
       >
         {comments.map((comment) => (
-          <DisplayComment comment={comment} />
+          <DisplayComment key={comment.id} comment={comment} />
         ))}
       </Section>
       <CommentForm
