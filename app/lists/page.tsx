@@ -62,7 +62,7 @@ const ListsPage = async () => {
             </Button>
           </div>
 
-          <div className="py-6">
+          <div className="pb-8">
             <SectionHeader title="Popular Lists" />
 
             <div className="flex flex-row gap-8 ">

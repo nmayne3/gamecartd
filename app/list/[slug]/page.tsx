@@ -57,18 +57,18 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
           <div className="flex flex-col gap-4 py-3">
             <h1 className="font-sans font-medium text-2xl"> {list.name} </h1>
             <p> {list.description} </p>
-            <div className="grid grid-cols-5 grid-flow-row gap-2 place-items-center py-2 pb-12 min-h-fit">
+            <div className="grid grid-cols-5 grid-flow-row gap-2 place-items-center py-2 pb-12 ">
               {games.map((entry, index) => (
                 <div
                   key={entry.game.slug}
-                  className="h-full w-full min-h-fit py-2"
+                  className="h-full w-full min-h-fit flex flex-col"
                 >
                   <Link key={entry.game.slug} href={`/game/${entry.game.slug}`}>
                     <BoxArt game={entry.game} size="big"></BoxArt>
                   </Link>
                   <div>
                     {list.ranked && (
-                      <div className="text-center h-full text-neutral-50 text-sm py-1">
+                      <div className="text-center h-full text-neutral-50 text-sm pt-1">
                         {" "}
                         {index + 1}{" "}
                       </div>

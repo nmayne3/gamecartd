@@ -218,7 +218,7 @@ export async function GetGameCombo(
 ) {
   const result = await GetGame(slug, include);
   if (!result || result.updatedAt == null || checkStale(result.updatedAt)) {
-    return AddGame(slug);
+    return AddGame(slug, include);
   }
   return result;
 }

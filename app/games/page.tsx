@@ -54,7 +54,7 @@ const GamesPage = async () => {
             </div>
           </div>
 
-          <Section header="Top Games">
+          <Section header="Top Games" className="pb-8">
             <RowGames games={TopGames} />
           </Section>
 
@@ -62,7 +62,7 @@ const GamesPage = async () => {
             <RowGames games={RecentReleases} />
           </Section>
 
-          <div className="flex flex-row gap-16">
+          <div className="flex flex-row gap-16 py-12">
             {/** Left Side */}
             <Section header={"Popular Reviews this week"} className="basis-3/4">
               <Suspense fallback={<PlaceholderReviews />}>

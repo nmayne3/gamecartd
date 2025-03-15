@@ -29,6 +29,7 @@ const CommentClientSection = ({
         header={
           comments.length > 0 ? `${comments.length} Comments` : `Comment?`
         }
+        className="!border-b-0"
       >
         {comments.map((comment) => (
           <DisplayComment key={comment.id} comment={comment} />
@@ -37,7 +38,7 @@ const CommentClientSection = ({
       <CommentForm
         type={type}
         replyingTo={replyingTo}
-        className="border-t-1 "
+        className={`${comments.length > 0 ? "border-t-1" : ""}`}
         setComments={setComments}
       />
     </div>

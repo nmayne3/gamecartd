@@ -190,9 +190,9 @@ const GetBackgroundImage = (game: {
   screenshots: Screenshots[];
   artworks: Artwork[];
 }) => {
-  if (game.screenshots.length) {
+  if (game.screenshots && game.screenshots.length) {
     return game.screenshots[0];
-  } else if (game.artworks.length) {
+  } else if (game.artworks && game.artworks.length) {
     return game.artworks[0];
   } else if (game.cover)
     return { image_id: game.cover, height: 1080, width: 1920 };

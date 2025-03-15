@@ -89,7 +89,7 @@ export default async function Home() {
         <div className="flex flex-row gap-8 h-full w-full place-content-center">
           <RowGames games={FeaturedGames} />
         </div>
-        <div className="flex flex-row gap-16 w-full">
+        <div className="flex flex-row gap-16 w-full pb-6">
           {/** Left Side */}
           <Section
             header={"Popular Reviews this week"}
