@@ -1,7 +1,7 @@
 "use client";
 
 import { Section, SectionHeader } from "../section";
-import DisplayComment from "./displayComment";
+import DisplayComment, { PlaceholderComment } from "./displayComment";
 import { useState } from "react";
 import { List, Prisma, Review } from "@prisma/client";
 import CommentForm from "./commentForm";

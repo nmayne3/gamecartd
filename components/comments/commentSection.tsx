@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { Section, SectionHeader } from "../section";
-import DisplayComment from "./displayComment";
-import { useState } from "react";
+import DisplayComment, { PlaceholderComment } from "./displayComment";
+import { Suspense, useState } from "react";
 import CommentClientSection from "./commentClientSection";
 import { List, Review } from "@prisma/client";
 
@@ -13,6 +13,28 @@ import { List, Review } from "@prisma/client";
  */
 
 const CommentSection = async ({
+  replyingTo,
+  type,
+}: {
+  replyingTo: List | Review;
+  type: "list" | "review";
+}) => {
+  return (
+    <Suspense
+      fallback={
+        <Section header="Loading Comments..." className="border-b-1">
+          <PlaceholderComment />
+        </Section>
+      }
+    >
+      <CommentServerSection replyingTo={replyingTo} type={type} />
+    </Suspense>
+  );
+};
+
+export default CommentSection;
+
+const CommentServerSection = async ({
   replyingTo,
   type,
 }: {
@@ -38,5 +60,3 @@ const CommentSection = async ({
     />
   );
 };
-
-export default CommentSection;
