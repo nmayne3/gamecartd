@@ -4,14 +4,16 @@ import ReviewWindow, { StarRating } from "../reviewwindow";
 import { Game } from "@prisma/client";
 import { CheckPlayed } from "@/app/api/games/actions";
 import prisma from "@/lib/prisma";
+import InteractionPanelWrapper from "../interactionpanel";
 
 export const InteractionPanel = async ({ game }: { game: Game }) => {
   const session = await getSession();
 
-  const [played, liked, backlogged] = session?.user.id
-    ? await CheckPlayed(game.slug, session?.user.id)
+  const [played, liked, backlogged] = session?.user.email
+    ? await CheckPlayed(game.slug, session?.user.email)
     : [false];
 
+  console.log("Game played: " + played);
   const rating = session?.user.id
     ? await prisma.rating.findUnique({
         where: { userId_gameId: { userId: session?.user.id, gameId: game.id } },
@@ -21,15 +23,15 @@ export const InteractionPanel = async ({ game }: { game: Game }) => {
   return (
     <div className="w-full">
       {!session && (
-        <section id="Logged out Review Buttons">
-          <h4 className="flex w-full bg-secondary rounded-t-sm-md justify-center outline outline-0.5 outline-primary p-2">
+        <InteractionPanelWrapper>
+          <h4 className="flex w-full bg-secondary rounded-t-sm-md justify-center p-2">
             {" "}
             Sign in to log, rate or review{" "}
           </h4>
-          <h4 className="flex w-full bg-secondary rounded-b-sm-md justify-center outline outline-0.5 outline-primary p-2">
+          <h4 className="flex w-full bg-secondary rounded-b-sm-md justify-center p-2">
             Share
           </h4>
-        </section>
+        </InteractionPanelWrapper>
       )}
       {session && (
         <section

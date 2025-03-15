@@ -16,10 +16,13 @@ export const LikeButton = ({
   initialState: boolean;
   initialCount: number;
 }) => {
+  console.log("InitialState: " + initialState);
   const [liked, setLiked] = useState(initialState);
   const [likeCount, setLikeCount] = useState(initialCount);
   const [optimisticLiked, setOptimisticLiked] = useOptimistic(liked);
   const [optimisticCount, setOptimisticCount] = useOptimistic(likeCount);
+
+  console.log("liked: " + liked);
 
   const handleChange = async () => {
     setOptimisticLiked(!liked);
@@ -49,8 +52,8 @@ export const LikeButton = ({
             className={`${optimisticLiked ? "fill-accent-orange" : ""}`}
           />
         </div>
-        <div className="group-hover:text-white">
-          {!optimisticLiked && "Like"}
+        <div className="group-hover:text-white font-medium">
+          {!optimisticLiked && "Like review"}
           {optimisticLiked && (
             <div>
               <div className="">{"Liked"}</div>
@@ -58,7 +61,7 @@ export const LikeButton = ({
           )}
         </div>
       </button>
-      <span> {`${optimisticCount} likes`}</span>
+      <span className="font-light"> {`${optimisticCount} likes`}</span>
     </div>
   );
 };

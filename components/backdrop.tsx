@@ -18,7 +18,7 @@ const Backdrop = ({ bg, name }: { bg?: Picture; name?: string }) => {
           width={bg.width}
           height={bg.height}
           alt={name}
-          className="z-0 object-cover aspect-video w-[1200px] h-fit max-w-[1200px] bg-cover bg-top bg-no-repeat mask"
+          className="z-0 object-cover aspect-video w-[1200px] h-fit max-w-full bg-cover bg-top bg-no-repeat mask"
           ref={ref}
           onLoad={() => setLoaded((loaded) => true)}
           draggable={false}

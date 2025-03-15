@@ -2,8 +2,16 @@ import prisma from "@/lib/prisma";
 import { ReviewCard } from "../reviewcardalt";
 import { Review } from "@prisma/client";
 import { Skeleton } from "../ui/skeleton";
+import { getSession } from "@/app/api/auth/[...nextauth]/auth";
 
 const PopularReviews = async () => {
+  const session = await getSession();
+  const user = session?.user
+    ? await prisma.user.findUnique({
+        where: { slug: session?.user.slug },
+        include: { likedPosts: true },
+      })
+    : undefined;
   const popularReviews = await prisma.review.findMany({
     include: {
       Game: true,
@@ -17,7 +25,11 @@ const PopularReviews = async () => {
   return (
     <div className="flex flex-col divide-y-1 divide-dark-grey">
       {popularReviews.map((review) => (
-        <ReviewCard key={review.id} review={review} />
+        <ReviewCard
+          key={review.id}
+          review={review}
+          user={user ? user : undefined}
+        />
       ))}
     </div>
   );

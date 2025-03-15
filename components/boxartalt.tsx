@@ -45,7 +45,7 @@ const BoxArt = ({
   const placeholder = game ? (game.cover ? false : true) : true;
   return (
     <div
-      className={`group relative rounded-sm-md shadow-xl smooth-transition bg-dark-grey outline outline-0.5 outline-secondary h-full w-full ${
+      className={`group relative rounded-sm-md shadow-xl smooth-transition bg-zinc-900 outline outline-0.5 outline-secondary h-full w-full ${
         hoverEffect
           ? "hover:-outline-offset-2 hover:outline-2 hover:outline-accent-green"
           : ""

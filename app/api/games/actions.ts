@@ -5,6 +5,7 @@ import { Game } from "@/igdb/interfaces";
 import { Prisma, User } from "@prisma/client";
 import { fetchGame } from "@/igdb/api";
 import { makeURLSafe } from "@/hooks/urlsafe";
+import { log } from "console";
 
 type GameWithReviewCount = Prisma.GameGetPayload<{
   include: {
@@ -287,13 +288,21 @@ export async function CreateReview({
     where: { email: session.user.email },
     include: {
       ratings: { where: { gameId: gameId } },
-      _count: { select: { likedGames: { where: { id: gameId } } } },
+      _count: {
+        select: {
+          likedGames: { where: { id: gameId } },
+          reviews: { where: { gameId: gameId } },
+        },
+      },
     },
   });
   if (!author) {
     console.log("user not found.");
     return null;
   }
+
+  const logCount =
+    author._count.reviews > 0 ? author._count.reviews : undefined;
 
   const constructedRating =
     author.ratings.length > 0 ? author.ratings[0].rating : null;
@@ -306,6 +315,7 @@ export async function CreateReview({
       gameId: gameId,
       rating: constructedRating,
       liked: author._count.likedGames > 0,
+      logCount: logCount,
     },
   });
 

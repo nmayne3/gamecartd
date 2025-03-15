@@ -87,7 +87,14 @@ export const ReviewCardGamePage = async ({ review }: { review: Review }) => {
       <div className="flex flex-col justify-start gap-4 p-4 text-sm">
         {/** Review Header */}
         <span className="text-xs flex flex-row gap-1 place-items-center">
-          Review by
+          <Link
+            href={`/user/${user.slug}/game/${game.slug}${
+              review.logCount ? review.logCount : ""
+            }`}
+            className="flex flex-row gap-1"
+          >
+            Review by
+          </Link>
           <h4 className="text-header-light-grey font-medium hover:text-cyan-400">
             {/** User Name */}
             <Link href={`/user/${user.slug}`} className="">
@@ -222,13 +229,15 @@ export const ReviewCard = async ({
   user?: UserWithLikedReviews;
 }) => {
   const initialLikeCount = review._count.likedBy;
-  const initialLikedState = user ? user.likedPosts.includes(review) : false;
+  const initialLikedState = user
+    ? user.likedPosts.map((post) => post.id).includes(review.id)
+    : false;
   return (
     <section
       id="Review Card"
-      className="flex flex-row py-4 min-h-fit h-40 justify-self-center"
+      className="flex flex-row py-4 w-full min-h-fit h-40 justify-self-center"
     >
-      {/** Profile Image / Left */}
+      {/** Box Art / Left */}
       <Link
         href={`/game/${review.Game.slug}`}
         className="w-20 h-fit flex-shrink-0"
@@ -241,7 +250,9 @@ export const ReviewCard = async ({
         <h2 className="font-dm-serif font-semibold text-white text-xl">
           {" "}
           <Link
-            href={`/game/${review.Game.slug}`}
+            href={`/user/${review.author.slug}/game/${review.Game.slug}/${
+              review.logCount ? review.logCount : ""
+            }`}
             className="hover:text-cyan-400"
           >
             {review.Game.name}{" "}
@@ -287,7 +298,7 @@ export const ReviewCard = async ({
   );
 };
 
-const StarRating = ({ rating }: { rating: number }) => {
+export const StarRating = async ({ rating }: { rating: number }) => {
   const stars = [];
   for (let i = 0.5; i < rating; i++) {
     stars.push(<FaStar className="fill-accent-green-alt" key={i} />);

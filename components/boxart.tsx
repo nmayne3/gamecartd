@@ -20,7 +20,7 @@ const BoxArt = ({
   size = size ? size : "big_2x";
   const [loaded, setLoaded] = useState(false);
   return (
-    <div className="group relative rounded-sm-md shadow-xl smooth-transition  outline outline-0.5 outline-secondary h-full w-full hover:-outline-offset-2 hover:outline-2 hover:outline-accent-green max-h-fit">
+    <div className="group relative bg-zinc-900 rounded-sm-md shadow-xl smooth-transition  outline outline-0.5 outline-secondary h-full w-full hover:-outline-offset-2 hover:outline-2 hover:outline-accent-green max-h-fit">
       {game.cover && (
         <Image
           src={`https://images.igdb.com/igdb/image/upload/t_cover_${size}/${game.cover.image_id}.jpg`}

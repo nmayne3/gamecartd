@@ -25,7 +25,7 @@ body {
   outline: 1px solid rgba(255,255,255,0.4);
   outline-offset: -1px;
   transition: all ease-out 100ms;
-
+  aspect-ratio: 1/1;
 }
 
 .profile-badge:hover {
@@ -317,6 +317,7 @@ label {
   border-bottom: solid 1px var(--border);
   outline: none;
   border-radius: calc(var(--radius) - 2px);
+  font-weight: 300;
 }
 
 .input-field:focus {
@@ -324,6 +325,14 @@ label {
   color: black;
   border: none;
   border-bottom: solid 1px transparent;
+}
+
+.input-field::placeholder {
+  opacity: 0.65;
+}
+
+.input-field:focus::placeholder {
+  opacity: 1;
 }
 
 .dropdown-link {

@@ -8,12 +8,21 @@ import {
 import SignIn from "./credentialSignIn";
 import ProvidersSignIn from "./providersSignIn";
 
-const SignInDialog = () => {
+/**
+ *
+ * @param className applied to the dialog trigger
+ * @returns
+ */
+
+const SignInDialog = ({ className }: { className?: string }) => {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="header-text"> Sign In </DialogTrigger>
+      <DialogTrigger className={`header-text ${className}`}>
+        {" "}
+        Sign In{" "}
+      </DialogTrigger>
       <DialogContent className="px-10 py-8">
         <DialogHeader>
           {" "}

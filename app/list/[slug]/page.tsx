@@ -6,6 +6,7 @@ import Backdrop from "@/components/backdrop";
 import InteractionPanelWrapper from "@/components/interactionpanel";
 import { ListLikeButton } from "@/components/lists/likeList";
 import { getSession } from "@/app/api/auth/[...nextauth]/auth";
+import CommentSection from "@/components/comments/commentSection";
 
 const ListPage = async ({ params }: { params: { slug: string } }) => {
   const slug = params.slug;
@@ -37,15 +38,15 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
                 <Image
                   src={author.image}
                   alt="Profile Picture"
-                  className="w-7 h-7 border-opacity-100 border-white outline-white/10 -outline-offset-1  outline-1 outline rounded-full aspect-square"
-                  width={32}
-                  height={32}
+                  className="profile-badge"
+                  width={24}
+                  height={24}
                 />
               </Link>
             )}
             <span className="text-sm flex flex-row gap-1 place-items-center">
-              Review by
-              <h4 className="text-header-light-grey font-normal hover:text-cyan-400">
+              List by
+              <h4 className="text-header-light-grey font-semibold hover:text-cyan-400 ">
                 {/** User Name */}
                 <Link href={`/user/${author.slug}`} className="">
                   {author.name}
@@ -53,35 +54,30 @@ const ListPage = async ({ params }: { params: { slug: string } }) => {
               </h4>
             </span>
           </div>
-          <div className="flex flex-col gap-2 py-2">
+          <div className="flex flex-col gap-4 py-3">
             <h1 className="font-sans font-medium text-2xl"> {list.name} </h1>
             <p> {list.description} </p>
-            <div>
-              <div className="grid grid-cols-5 grid-flow-row gap-2 place-items-center py-2 min-h-fit">
-                {games.map((entry, index) => (
-                  <div
-                    key={entry.game.slug}
-                    className="h-full w-full min-h-fit py-2"
-                  >
-                    <Link
-                      key={entry.game.slug}
-                      href={`/game/${entry.game.slug}`}
-                    >
-                      <BoxArt game={entry.game} size="big"></BoxArt>
-                    </Link>
-                    <div>
-                      {list.ranked && (
-                        <div className="text-center h-full text-neutral-50 text-sm py-1">
-                          {" "}
-                          {index + 1}{" "}
-                        </div>
-                      )}
-                    </div>
+            <div className="grid grid-cols-5 grid-flow-row gap-2 place-items-center py-2 pb-12 min-h-fit">
+              {games.map((entry, index) => (
+                <div
+                  key={entry.game.slug}
+                  className="h-full w-full min-h-fit py-2"
+                >
+                  <Link key={entry.game.slug} href={`/game/${entry.game.slug}`}>
+                    <BoxArt game={entry.game} size="big"></BoxArt>
+                  </Link>
+                  <div>
+                    {list.ranked && (
+                      <div className="text-center h-full text-neutral-50 text-sm py-1">
+                        {" "}
+                        {index + 1}{" "}
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>{" "}
-            </div>
-            <div></div>
+                </div>
+              ))}
+            </div>{" "}
+            <CommentSection replyingTo={list} type="list" />
           </div>
         </div>
         <InteractionPanelWrapper>
